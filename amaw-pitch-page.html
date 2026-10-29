@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:title" content="Alaska Marine Animal Watch (AMAW)">
+<meta property="og:description" content="A free, community-driven app for logging marine mammal sightings across Southeast Alaska. Stewardship through action.">
+<title>Alaska Marine Animal Watch — Stewardship Through Action</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Elms+Sans:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1E77AF; --slate:#547492; --coral:#E8634A; --red:#FF2859;
+  --paper:#FAF9F7; --ink:#0A1628; --soft:#4A5568; --success:#15803D;
+  --navy:#0f2038; --line:rgba(10,22,40,.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:'Lato',sans-serif;line-height:1.65;font-size:17px}
+.mono{font-family:'Lato',sans-serif;letter-spacing:.12em;text-transform:uppercase;font-size:.72rem;font-weight:600}
+h1,h2,h3{font-family:'Elms Sans',sans-serif;line-height:1.15}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+/* top bar */
+.top{display:flex;justify-content:space-between;align-items:center;padding:20px 0;flex-wrap:wrap;gap:12px}
+.wordmark{font-family:'Elms Sans',sans-serif;font-weight:800;font-size:1.35rem;letter-spacing:.02em}
+.wordmark span{color:var(--blue)}
+.badge{border:1.5px solid var(--slate);color:var(--slate);padding:6px 12px;border-radius:999px;font-size:.65rem}
+.badge b{color:var(--coral)}
+
+/* hero */
+.hero{padding:72px 0 56px;border-bottom:1px solid var(--line)}
+.hero .mono{color:var(--slate);margin-bottom:18px}
+.hero h1{font-size:clamp(2.2rem,5vw,3.4rem);font-weight:800;max-width:14ch}
+.hero h1 em{font-style:normal;color:var(--blue)}
+.hero p.lede{max-width:56ch;margin:22px 0 32px;color:var(--soft);font-size:1.15rem}
+.ctas{display:flex;gap:14px;flex-wrap:wrap}
+.btn{font-family:'Elms Sans',sans-serif;font-weight:600;text-decoration:none;padding:14px 26px;border-radius:10px;display:inline-block}
+.btn.primary{background:var(--blue);color:#fff}
+.btn.primary:hover{background:#16618f}
+.btn.ghost{border:1.5px solid var(--line);color:var(--ink)}
+.btn.ghost:hover{border-color:var(--blue);color:var(--blue)}
+
+/* section scaffolding */
+section{padding:64px 0}
+.sec-head{margin-bottom:36px}
+.sec-head .mono{color:var(--coral);margin-bottom:10px}
+.sec-head h2{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800}
+
+/* what it does cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:26px}
+.card .mono{color:var(--blue);margin-bottom:12px}
+.card h3{font-size:1.05rem;margin-bottom:8px}
+.card p{color:var(--soft);font-size:.95rem}
+
+/* goals */
+.goals{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;counter-reset:goal}
+.goal{border-top:3px solid var(--blue);padding-top:18px}
+.goal:before{counter-increment:goal;content:"0" counter(goal);font-family:'Lato',sans-serif;color:var(--coral);font-size:.85rem;font-weight:600;display:block;margin-bottom:10px}
+.goal h3{font-size:1.02rem;margin-bottom:6px}
+.goal p{color:var(--soft);font-size:.92rem}
+
+/* data flow */
+.flow{display:flex;flex-wrap:wrap;gap:0;align-items:stretch}
+.step{flex:1 1 200px;border:1px solid var(--line);border-left:none;padding:22px;position:relative;background:#fff}
+.step:first-child{border-left:1px solid var(--line);border-radius:12px 0 0 12px}
+.step:last-child{border-radius:0 12px 12px 0}
+.step .mono{color:var(--slate);display:block;margin-bottom:8px}
+.step h3{font-size:.95rem}
+.step p{font-size:.85rem;color:var(--soft)}
+
+/* phones */
+.screens{display:flex;gap:32px;justify-content:center;flex-wrap:wrap;margin-top:44px}
+.phone{width:250px;border-radius:34px;background:var(--navy);padding:12px;box-shadow:0 20px 50px rgba(10,22,40,.25)}
+.phone .screen{border-radius:24px;overflow:hidden;height:480px;position:relative;display:flex;flex-direction:column}
+/* map screen */
+.map{background:linear-gradient(180deg,#123a5c 0%,#0f2038 100%);flex:1;position:relative}
+.map:before{content:"";position:absolute;inset:0;
+ background:
+  radial-gradient(circle at 30% 40%,rgba(84,116,146,.5) 0 18%,transparent 19%),
+  radial-gradient(circle at 72% 22%,rgba(30,119,175,.35) 0 12%,transparent 13%),
+  radial-gradient(circle at 55% 70%,rgba(84,116,146,.4) 0 22%,transparent 23%),
+  radial-gradient(circle at 15% 80%,rgba(30,119,175,.3) 0 10%,transparent 11%)}
+.pin{position:absolute;width:12px;height:12px;border-radius:50% 50% 50% 0;transform:rotate(-45deg)}
+.pin.coral{background:var(--coral)} .pin.blue{background:var(--blue)} .pin.teal{background:#00c9b1}
+.sight-card{position:absolute;bottom:12px;left:12px;right:12px;background:rgba(250,249,247,.96);border-radius:12px;padding:12px 14px}
+.sight-card .mono{color:var(--slate);font-size:.6rem;display:block;margin-bottom:4px}
+.sight-card h4{font-family:'Elms Sans',sans-serif;font-size:.85rem}
+.sight-card small{color:var(--soft);font-size:.72rem}
+.map-top{position:absolute;top:10px;left:12px;right:12px;display:flex;justify-content:space-between}
+.chip{background:rgba(250,249,247,.92);border-radius:999px;padding:5px 10px;font-family:'Lato',sans-serif;font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;color:var(--navy)}
+/* report screen */
+.report{background:var(--paper);flex:1;padding:18px 16px;display:flex;flex-direction:column;gap:12px}
+.report .mono{color:var(--slate);font-size:.6rem}
+.report h4{font-family:'Elms Sans',sans-serif;font-size:.95rem}
+.field{border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:.72rem;color:var(--soft);background:#fff}
+.field b{display:block;font-family:'Lato',sans-serif;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:3px}
+.report .btn.primary{padding:10px;text-align:center;font-size:.8rem;margin-top:auto}
+
+/* partners */
+.partners{background:var(--navy);color:#e8eef4;padding:96px 0}
+.partners .mono{color:#00c9b1;margin-bottom:10px}
+.partners h2{color:#fff}
+.partners p{max-width:68ch;color:#b9c6d6;margin-top:16px}
+.orgs{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.org{border:1px solid rgba(232,238,244,.25);border-radius:999px;padding:8px 16px;font-family:'Elms Sans',sans-serif;font-size:.82rem}
+
+/* footer */
+footer{padding:44px 0;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:center}
+footer a{color:var(--blue);text-decoration:none}
+footer .fine{font-size:.78rem;color:var(--soft)}
+@media(max-width:640px){.hero{padding:48px 0 40px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="wordmark">Alaska Marine Animal Watch</div>
+    <div class="badge mono">Concept preview <b>·</b> App in Active Development</div>
+  </div>
+
+  <header class="hero">
+    <div class="mono">Community Wildlife Interactions Map · Southeast Alaska</div>
+    <h1>Stewardship Through <em>Action.</em></h1>
+    <p class="lede">A free, community-driven app for logging marine mammal sightings and reporting potential incidents across Southeast Alaska.</p>
+      
+      <p class="lede">By turning everyday encounters on the water into a living map, we help people watch and enjoy wildlife more responsibly.</p>
+            <p class="lede">Built in Juneau, for the whole region.</p>
+    <div class="ctas">
+      <a class="btn primary" href="mockup.html">Open the interactive preview →</a>
+      <a class="btn ghost" href="mailto:hello@alaskamarineanimalwatch.com">Partner with us</a>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-head">
+      <div class="mono">What Alaska Marine Animal Watch does</div>
+      <h2>Four Actions. One App.</h2>
+    </div>
+    <div class="grid">
+      <div class="card"><span class="mono">01 · Log</span><h3>Real Sightings</h3><p>Whales, sea lions, otters, porpoises and more — species, count, behavior, photos, and GPS location.</p></div>
+      <div class="card"><span class="mono">02 · Map</span><h3>Live Map</h3><p>Sightings populate a public map so operators see recent activity and avoid crowding the same animals.</p></div>
+      <div class="card"><span class="mono">03 · Report</span><h3>Report Violations</h3><p>Confidential reporting of harassment and approach-distance breaches and photos for enforcement.</p></div>
+      <div class="card"><span class="mono">04 · Sync</span><h3>Works Offline</h3><p>Out of cell range? Reports save to the device and sync the moment signal returns. iOS, iPad & Android.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="mono">Our goals</div>
+      <h2>Why we're building it.</h2>
+    </div>
+    <div class="goals">
+      <div class="goal"><h3>Stewardship Through Action</h3><p>We help people protect what they love by watching it responsibly.</p></div>
+      <div class="goal"><h3>Reduce Wildlife Disturbance</h3><p>Real-time awareness so boats spread out instead of converging on one pod.</p></div>
+      <div class="goal"><h3>Strengthen Enforcement</h3><p>Get credible reports to the right agencies with location, time, and evidence. With anonymous options.</p></div>
+      <div class="goal"><h3>Build an Open Record</h3><p>A community dataset of regional marine-mammal activity that scientists and policymakers can use.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="mono">How the data flows</div>
+      <h2>From the Water. For the Record.</h2>
+    </div>
+    <div class="flow">
+      <div class="step"><span class="mono">01</span><h3>Field Report</h3><p>Logged in-app with GPS & photo.</p></div>
+      <div class="step"><span class="mono">02</span><h3>Secure Intake</h3><p>Identities kept private.</p></div>
+      <div class="step"><span class="mono">03</span><h3>Public Map</h3><p>Open sightings feed.</p></div>
+      <div class="step"><span class="mono">04</span><h3>Partners & Science</h3><p>Free shared data layers.</p></div>
+    </div>
+
+    <div class="screens">
+      <div class="phone"><div class="screen">
+        <div class="map">
+          <div class="map-top"><span class="chip">Juneau, AK</span><span class="chip">Live</span></div>
+          <div class="pin coral" style="top:32%;left:28%"></div>
+          <div class="pin blue" style="top:22%;left:62%"></div>
+          <div class="pin teal" style="top:58%;left:48%"></div>
+          <div class="pin coral" style="top:70%;left:30%"></div>
+          <div class="sight-card">
+            <span class="mono">Humpback whale · 2</span>
+            <h4>Breaching, Tail lobbing</h4>
+            <small>Shared anonymously · 4 minutes ago</small>
+          </div>
+        </div>
+      </div></div>
+      <div class="phone"><div class="screen">
+        <div class="report">
+          <span class="mono">New sighting</span>
+          <h4>What did you see?</h4>
+          <div class="field"><b>Species</b>Humpback whale</div>
+          <div class="field"><b>Behavior</b>Breaching · tail lobbing</div>
+          <div class="field"><b>Location</b>📍 GPS pinned — Favorite Bay</div>
+          <div class="field"><b>Handle</b>anonymous by default</div>
+          <a class="btn primary">Share the sighting</a>
+        </div>
+      </div></div>
+        </div>
+  </section>
+
+</div>  <!-- ← NEW: closes the .wrap that opened at the top of the body -->
+
+<section class="partners">
+  <div class="wrap">  <!-- ← NEW: inner wrap keeps the text aligned with the rest of the page -->
+    <div class="mono">Working with Partners</div>
+    <h2>Light-touch and Reciprocal.</h2>
+    <p>Shared datasets are pulled on a schedule into our own cache — never per-user requests against a partner's servers — and always carry clear attribution and a link back. We're glad to send sightings and photos back to research catalogs, follow licensing terms, and keep sensitive reports confidential.</p>
+    <div class="orgs">
+      <span class="org">Research Catalogs & Sighting Networks</span>
+      <span class="org">NOAA & Enforcement Agencies</span>
+      <span class="org">Tlingit & Cultural Organizations</span>
+      <span class="org">Tour Operators & Naturalists</span>
+      <span class="org">Conservation Nonprofits</span>
+      <span class="org">Community Members</span>
+      <span class="org">Commercial Fishermen</span>
+      <span class="org">University of Alaska Students</span>
+      <span class="org">Wildlife Enthusiasts</span>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">  <!-- ← NEW: reopens .wrap so the footer stays centered like before -->
+
+    <footer>
+    <div>
+      <div class="wordmark">Alaska Marine Animal Watch</div>
+      <div class="fine">A community project from Southeast Alaska — inquiries welcome.</div>
+    </div>
+    <div style="text-align:right">
+      <a href="mailto:hello@alaskamarineanimalwatch.com">hello@alaskamarineanimalwatch.com</a>
+      <div class="fine">Concept Preview · The App is in Active Development · Built in Juneau 🐋</div>
+    </div>
+  </footer>
+
+</div>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" nonce="zYsFCZx+NQx+BJmAoqNpIA==" data-cf-beacon='{"version":"2024.11.0","token":"36b4216ae2dc4d5488c249161e71fe1e","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

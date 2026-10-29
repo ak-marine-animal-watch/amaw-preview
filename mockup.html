@@ -1,0 +1,3206 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:title" content="Alaska Marine Animal Watch Community Wildlife Interactions">
+<meta property="og:description" content="Southeast Alaska's Community Wildlife Interactions map. See something on the water? Share it here!">
+<meta name="description" content="Alaska Marine Animal Watch is Southeast Alaska's community record of marine wildlife interactions. Log a sighting, report a concern, download the open data.">
+<title>Alaska Marine Animal Watch</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Elms+Sans:ital,wght@0,100..900;1,100..900&family=IBM+Plex+Mono:wght@400;500&family=Lato:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy-deep: #0a1628;
+  --navy: #0f2038;
+  --navy-mid: #162d4a;
+  --navy-light: #1e3a5f;
+  --slate: #2a4a6b;
+  --slate-light: #3d6080;
+  --teal: #1E77AF;
+  --teal-glow: #3C90C4;
+  --teal-dark: #155F8C;
+  --seafoam: #7FB9D8;
+  --seafoam-light: #A9CDE5;
+  --amber: #f0a830;
+  --coral: #e8634a;
+  --text-primary: #e8edf4;
+  --text-secondary: #94a8c4;
+  --text-muted: #5e7899;
+  --surface: #0f2038;
+  --surface-raised: #162d4a;
+  --surface-overlay: rgba(15,32,56,0.95);
+  --border: rgba(30,119,175,0.22);
+  --border-subtle: rgba(148,168,196,0.1);
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --shadow-glow: 0 0 30px rgba(30,119,175,0.18);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 20px;
+  --font-display: 'Elms Sans', sans-serif;
+  --font-body: 'Lato', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html[data-theme="light"] {
+  --navy-deep: #f0f4f8;
+  --navy: #ffffff;
+  --navy-mid: #e8eef4;
+  --navy-light: #dce4ee;
+  --slate: #94a8c4;
+  --slate-light: #b0c0d4;
+  --teal: #16618F;
+  --teal-glow: #1E77AF;
+  --teal-dark: #0F4C6E;
+  --seafoam: #2E8BC5;
+  --seafoam-light: #3C90C4;
+  --text-primary: #0f2038;
+  --text-secondary: #3d5a80;
+  --text-muted: #6b89ab;
+  --surface: #ffffff;
+  --surface-raised: #f0f4f8;
+  --surface-overlay: rgba(255,255,255,0.97);
+  --border: rgba(22,97,143,0.25);
+  --border-subtle: rgba(15,32,56,0.08);
+  --shadow: 0 4px 24px rgba(0,0,0,0.08);
+  --shadow-glow: 0 0 30px rgba(22,97,143,0.12);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--navy-deep);
+  color: var(--text-primary);
+  line-height: 1.65;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--navy-deep); }
+::-webkit-scrollbar-thumb { background: var(--slate); border-radius: 3px; }
+
+/* ─── NAV ─── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  background: var(--surface-overlay);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0 1.25rem;
+  transition: var(--transition);
+}
+.nav-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 64px;
+}
+.nav-logo {
+  font-family: var(--font-display);
+  font-weight: 800; font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  color: var(--teal);
+  text-decoration: none;
+  display: flex; align-items: center;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.nav-links { display: flex; align-items: center; gap: 0.25rem; }
+.nav-link {
+  font-family: var(--font-display);
+  font-size: 0.8rem; font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none; padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+  letter-spacing: 0.02em;
+  cursor: pointer; border: none; background: none;
+}
+.nav-link:hover, .nav-link.active { color: var(--teal); background: rgba(30,119,175,0.08); }
+.theme-toggle {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--surface-raised); border: 1px solid var(--border-subtle);
+  color: var(--text-secondary); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+.nav-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+.nav-item { position: relative; }
+.nav-parent { display: inline-flex; align-items: center; gap: 0.3rem; }
+.nav-caret { transition: var(--transition); flex-shrink: 0; }
+.nav-item.open .nav-caret { transform: rotate(180deg); }
+.nav-dropdown {
+  display: none; position: absolute; top: calc(100% + 6px); left: 0;
+  background: var(--surface-overlay); backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);
+  min-width: 215px; padding: 0.5rem; z-index: 1100; box-shadow: var(--shadow);
+}
+.nav-item.open .nav-dropdown { display: block; }
+.nav-dropdown .nav-link { display: block; width: 100%; text-align: left; }
+.theme-toggle:hover { border-color: var(--teal); color: var(--teal); }
+.mobile-menu-btn {
+  display: none; background: none; border: none; color: var(--text-primary);
+  font-size: 1.5rem; cursor: pointer; padding: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .nav-links { 
+    display: none; position: fixed; top: 64px; left: 0; right: 0;
+    background: var(--surface-overlay); backdrop-filter: blur(20px);
+    flex-direction: column; padding: 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .nav-links.open { display: flex; }
+  .nav-link { width: 100%; text-align: left; padding: 0.75rem 1rem; font-size: 0.95rem; }
+  .mobile-menu-btn { display: block; }
+  .nav-item { width: 100%; }
+  .nav-dropdown {
+    display: block; position: static;
+    background: none; backdrop-filter: none; border: none; box-shadow: none;
+    min-width: 0; padding: 0 0 0 1.1rem; z-index: auto;
+  }
+  .nav-caret { transform: rotate(180deg); }
+}
+
+/* ─── PAGES ─── */
+.page { display: none; min-height: 100vh; padding-top: 64px; }
+.page.active { display: block; }
+
+/* ─── HERO ─── */
+.hero {
+  position: relative; overflow: hidden;
+  min-height: calc(100vh - 64px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 3rem 1.25rem;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background: 
+    radial-gradient(ellipse at 20% 80%, rgba(30,119,175,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(30,58,95,0.4) 0%, transparent 50%),
+    linear-gradient(180deg, var(--navy-deep) 0%, var(--navy) 100%);
+}
+.hero-waves {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 200px;
+  opacity: 0.06;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 8px, var(--teal) 8px, var(--teal) 9px
+  );
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 200'%3E%3Cpath d='M0,100 Q150,20 300,100 T600,100 T900,100 T1200,100 L1200,200 L0,200Z' fill='white'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 200'%3E%3Cpath d='M0,100 Q150,20 300,100 T600,100 T900,100 T1200,100 L1200,200 L0,200Z' fill='white'/%3E%3C/svg%3E");
+  mask-size: 100% 100%;
+  animation: waveShift 8s ease-in-out infinite alternate;
+}
+@keyframes waveShift { to { transform: translateX(-30px); } }
+
+.hero-content { position: relative; text-align: center; max-width: 720px; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: var(--font-display); font-size: 0.75rem; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--teal); background: rgba(30,119,175,0.08);
+  border: 1px solid rgba(30,119,175,0.2);
+  padding: 0.4rem 1rem; border-radius: 100px;
+  margin-bottom: 1.5rem;
+  animation: fadeUp 0.8s ease-out;
+}
+.hero-badge::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--teal); animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  font-weight: 900; line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+  animation: fadeUp 0.8s ease-out 0.1s both;
+}
+.hero-title .hero-sub1 { font-family: var(--font-body); font-weight: 700; font-size: 0.45em; letter-spacing: 0.01em; color: var(--text-primary); }
+.hero-title .hero-sub2 { font-family: var(--font-body); font-weight: 400; font-size: 0.42em; letter-spacing: 0.01em; color: var(--text-secondary); }
+.hero-tagline {
+  font-family: var(--font-body); font-style: italic;
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  color: var(--text-secondary); margin-bottom: 0.75rem;
+  animation: fadeUp 0.8s ease-out 0.2s both;
+}
+.hero-desc {
+  font-size: 1.05rem; color: var(--text-secondary);
+  max-width: 560px; margin: 0 auto 2.5rem;
+  animation: fadeUp 0.8s ease-out 0.3s both;
+}
+.hero-ctas {
+  display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+  animation: fadeUp 0.8s ease-out 0.4s both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── BUTTONS ─── */
+.btn {
+  font-family: var(--font-display);
+  font-weight: 600; font-size: 0.95rem;
+  padding: 0.85rem 1.75rem; border-radius: var(--radius);
+  border: none; cursor: pointer; transition: var(--transition);
+  text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;
+  letter-spacing: 0.02em;
+}
+.btn-primary {
+  background: var(--teal); color: var(--navy-deep);
+  box-shadow: 0 4px 16px rgba(30,119,175,0.3);
+}
+.btn-primary:hover {
+  background: var(--teal-glow);
+  box-shadow: 0 6px 24px rgba(30,119,175,0.4);
+  transform: translateY(-2px);
+}
+.btn-secondary {
+  background: transparent; color: var(--teal);
+  border: 1.5px solid var(--teal);
+}
+.btn-secondary:hover {
+  background: rgba(30,119,175,0.08);
+  transform: translateY(-2px);
+}
+.btn-coral {
+  background: var(--coral); color: #fff;
+  box-shadow: 0 4px 16px rgba(232,99,74,0.3);
+}
+.btn-coral:hover {
+  background: #ec7a66;
+  box-shadow: 0 6px 24px rgba(232,99,74,0.4);
+  transform: translateY(-2px);
+}
+.btn-sm { padding: 0.6rem 1.25rem; font-size: 0.85rem; }
+
+/* ─── SECTIONS ─── */
+.section {
+  max-width: 900px; margin: 0 auto;
+  padding: 4rem 1.25rem;
+}
+.section-header {
+  text-align: center; margin-bottom: 3rem;
+}
+.section-label {
+  font-family: var(--font-display);
+  font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--teal); margin-bottom: 0.75rem;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800; line-height: 1.15;
+  letter-spacing: -0.01em; margin-bottom: 1rem;
+}
+.section-subtitle {
+  font-size: 1.05rem; color: var(--text-secondary);
+  max-width: 600px; margin: 0 auto;
+}
+
+/* ─── FORMS ─── */
+.form-page { background: var(--navy-deep); }
+.form-container {
+  max-width: 640px; margin: 0 auto;
+  padding: 3rem 1.25rem 4rem;
+}
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow);
+}
+.form-group { margin-bottom: 1.5rem; }
+.form-label {
+  display: block; font-family: var(--font-display);
+  font-size: 0.85rem; font-weight: 600;
+  color: var(--text-primary); margin-bottom: 0.4rem;
+}
+.form-label .optional {
+  font-weight: 400; color: var(--text-muted); font-size: 0.75rem;
+}
+.form-label .private {
+  font-weight: 400; color: var(--amber); font-size: 0.7rem;
+  margin-left: 0.25rem;
+}
+.form-input, .form-select, .form-textarea {
+  width: 100%; padding: 0.75rem 1rem;
+  background: var(--navy-deep); color: var(--text-primary);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body); font-size: 0.95rem;
+  transition: var(--transition);
+  appearance: none;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none; border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(30,119,175,0.1);
+}
+.form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='%2394a8c4'%3E%3Cpath d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+.form-textarea { min-height: 100px; resize: vertical; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+
+.toggle-group {
+  display: flex; gap: 0.5rem; margin-top: 0.25rem;
+}
+.toggle-option {
+  font-family: var(--font-display); font-size: 0.85rem; font-weight: 500;
+  padding: 0.5rem 1.25rem; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border-subtle);
+  background: transparent; color: var(--text-secondary);
+  cursor: pointer; transition: var(--transition);
+}
+.toggle-option.active {
+  border-color: var(--teal); color: var(--teal);
+  background: rgba(30,119,175,0.08);
+}
+.toggle-option:hover:not(.active) { border-color: var(--slate-light); }
+
+.file-upload {
+  border: 2px dashed var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 1.5rem; text-align: center;
+  cursor: pointer; transition: var(--transition);
+  position: relative;
+}
+.file-upload:hover { border-color: var(--teal); }
+.file-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.file-upload-icon { font-size: 1.5rem; margin-bottom: 0.25rem; color: var(--text-muted); }
+.file-upload-text {
+  font-family: var(--font-display); font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.file-upload-text strong { color: var(--teal); }
+
+.form-submit {
+  margin-top: 2rem; display: flex; justify-content: center;
+}
+
+/* Success message */
+.form-success {
+  display: none; text-align: center; padding: 3rem 2rem;
+}
+.form-success.show { display: block; }
+.form-success-icon { margin-bottom: 1rem; line-height: 0; }
+.form-success h3 {
+  font-family: var(--font-display); font-size: 1.5rem;
+  font-weight: 700; margin-bottom: 0.75rem; color: var(--teal);
+}
+.form-success p { color: var(--text-secondary); margin-bottom: 1.5rem; }
+
+/* ─── MAP ─── */
+.map-page { background: var(--navy-deep); }
+.map-container {
+  max-width: 1200px; margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+.map-wrapper {
+  display: grid; grid-template-columns: 260px 1fr; gap: 1rem;
+  height: 600px; border-radius: var(--radius-lg); overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow);
+}
+@media (max-width: 768px) {
+  .map-wrapper { grid-template-columns: 1fr; height: auto; }
+}
+.map-sidebar {
+  background: var(--surface);
+  padding: 1.5rem; overflow-y: auto;
+  border-right: 1px solid var(--border-subtle);
+}
+.map-sidebar h3 {
+  font-family: var(--font-display); font-size: 1rem;
+  font-weight: 700; margin-bottom: 1rem;
+}
+.filter-group { margin-bottom: 1.25rem; }
+.filter-label {
+  font-family: var(--font-display);
+  font-size: 0.75rem; font-weight: 600;
+  color: var(--text-muted); letter-spacing: 0.08em;
+  text-transform: uppercase; margin-bottom: 0.5rem;
+}
+.filter-checks { display: flex; flex-direction: column; gap: 0.35rem; }
+.filter-check {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-family: var(--font-display); font-size: 0.82rem;
+  color: var(--text-secondary); cursor: pointer;
+}
+.filter-check input { accent-color: var(--teal); }
+.species-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.map-stats {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
+  margin-top: 1rem;
+}
+.map-stat {
+  background: var(--surface-raised); border-radius: var(--radius-sm);
+  padding: 0.75rem; text-align: center;
+}
+.map-stat-num {
+  font-family: var(--font-display); font-size: 1.5rem;
+  font-weight: 800; color: var(--teal);
+}
+.map-stat-label {
+  font-family: var(--font-display); font-size: 0.65rem;
+  font-weight: 500; color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+#sighting-map {
+  min-height: 400px; width: 100%;
+  background: var(--navy-mid);
+}
+.download-bar {
+  display: flex; justify-content: flex-end; align-items: center;
+  margin-top: 1rem; gap: 1rem;
+}
+.data-badge {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  font-family: var(--font-display); font-size: 0.75rem; font-weight: 600;
+  padding: 0.35rem 0.85rem; border-radius: 100px;
+  margin-top: 1rem; letter-spacing: 0.02em;
+}
+.data-badge-sample {
+  color: var(--text-muted); background: rgba(148,168,196,0.08);
+  border: 1px solid rgba(148,168,196,0.15);
+}
+.data-badge-live {
+  color: var(--teal); background: rgba(30,119,175,0.08);
+  border: 1px solid rgba(30,119,175,0.2);
+}
+.data-badge-loading {
+  color: var(--amber); background: rgba(240,168,48,0.08);
+  border: 1px solid rgba(240,168,48,0.2);
+}
+
+/* Custom Leaflet popup */
+.leaflet-popup-content-wrapper {
+  background: var(--surface) !important;
+  color: var(--text-primary) !important;
+  border-radius: var(--radius) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow) !important;
+  font-family: var(--font-display) !important;
+}
+.leaflet-popup-tip { background: var(--surface) !important; }
+.popup-title {
+  font-weight: 700; font-size: 1rem; margin-bottom: 0.35rem;
+}
+.popup-detail {
+  font-size: 0.8rem; color: var(--text-secondary);
+  margin: 0.15rem 0;
+}
+.popup-detail strong { color: var(--text-primary); font-weight: 600; }
+
+/* ─── INFO PAGES ─── */
+.info-page { background: var(--navy-deep); }
+.info-section {
+  max-width: 760px; margin: 0 auto;
+  padding: 3rem 1.25rem 4rem;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+.info-card h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem; font-weight: 800;
+  margin-bottom: 1rem;
+}
+.info-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem; font-weight: 700;
+  color: var(--teal); margin: 1.5rem 0 0.5rem;
+}
+.info-card p {
+  color: var(--text-secondary); margin-bottom: 1rem;
+  line-height: 1.7;
+}
+.info-card p:last-child { margin-bottom: 0; }
+
+.reg-highlight {
+  display: flex; gap: 1.25rem; margin: 1.5rem 0;
+  flex-wrap: wrap;
+}
+.reg-box {
+  flex: 1; min-width: 200px;
+  background: var(--surface-raised);
+  border-left: 3px solid var(--teal);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 1.25rem;
+}
+.reg-box .distance {
+  font-family: var(--font-display);
+  font-size: 2rem; font-weight: 900;
+  color: var(--teal);
+}
+.reg-box .species-label {
+  font-family: var(--font-display);
+  font-size: 0.85rem; font-weight: 600;
+  margin-top: 0.25rem;
+}
+.reg-box .reg-note {
+  font-size: 0.8rem; color: var(--text-muted);
+  margin-top: 0.35rem;
+}
+
+/* SABER connection */
+.saber-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: var(--font-display); font-size: 0.8rem; font-weight: 600;
+  color: var(--amber); background: rgba(240,168,48,0.08);
+  border: 1px solid rgba(240,168,48,0.2);
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  margin-bottom: 1.25rem;
+}
+
+/* ─── FOOTER ─── */
+.footer {
+  background: var(--surface);
+  border-top: 1px solid var(--border-subtle);
+  padding: 2.5rem 1.25rem;
+  text-align: center;
+}
+.footer-inner { max-width: 600px; margin: 0 auto; }
+.footer-logo {
+  font-family: var(--font-display);
+  font-weight: 900; font-size: 1.25rem;
+  color: var(--teal); letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+.footer-text {
+  font-size: 0.85rem; color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+.footer-sub {
+  font-family: var(--font-display);
+  font-size: 0.7rem; color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+/* ─── GALLERY ─── */
+.marker-cluster-small,
+.marker-cluster-medium,
+.marker-cluster-large {
+  background-color: rgba(0, 201, 177, 0.2) !important;
+}
+.marker-cluster-small div,
+.marker-cluster-medium div,
+.marker-cluster-large div {
+  background-color: rgba(0, 201, 177, 0.7) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  font-family: var(--font-display) !important;
+}
+.species-dot-marker {
+  background: none !important;
+  border: none !important;
+}
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+.gallery-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+.gallery-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-glow);
+}
+.gallery-img {
+  width: 100%; aspect-ratio: 4/3;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3.5rem;
+  position: relative; overflow: hidden;
+}
+.gallery-img::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 60%, var(--surface) 100%);
+}
+.gallery-dot {
+  width: 56px; height: 56px; border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.85);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+.gallery-body {
+  padding: 1.25rem;
+}
+.gallery-species {
+  font-family: var(--font-display);
+  font-size: 1rem; font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+.gallery-meta {
+  font-family: var(--font-display);
+  font-size: 0.78rem; color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+.gallery-caption {
+  font-size: 0.88rem; color: var(--text-secondary);
+  line-height: 1.5;
+}
+.gallery-credit {
+  font-family: var(--font-display);
+  font-size: 0.72rem; color: var(--text-muted);
+  margin-top: 0.5rem; font-style: italic;
+}
+.social-cta {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+  margin-top: 2rem;
+}
+.social-cta h3 {
+  font-family: var(--font-display);
+  font-size: 1.25rem; font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+.social-cta p {
+  color: var(--text-secondary);
+  max-width: 520px; margin: 0 auto 1.25rem;
+}
+.hashtag {
+  font-family: var(--font-display);
+  font-weight: 800; font-size: 1.5rem;
+  color: var(--teal); letter-spacing: -0.01em;
+  margin-bottom: 1rem;
+}
+.social-links {
+  display: flex; gap: 1rem; justify-content: center;
+  flex-wrap: wrap; margin-top: 1rem;
+}
+.social-link {
+  font-family: var(--font-display);
+  font-size: 0.85rem; font-weight: 600;
+  color: var(--teal); text-decoration: none;
+  padding: 0.5rem 1.25rem;
+  border: 1.5px solid var(--teal);
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+.social-link:hover {
+  background: rgba(30,119,175,0.08);
+}
+.gallery-opt-in {
+  font-family: var(--font-display);
+  font-size: 0.8rem; color: var(--text-muted);
+  text-align: center; margin-top: 1.5rem;
+  padding: 1rem;
+  border-top: 1px solid var(--border-subtle);
+}
+/* ─── PHOTO LAYERS ─── */
+.gallery-img img, .empty-photo img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover;
+}
+.photo-credit {
+  position: absolute; top: 0.6rem; right: 0.75rem; z-index: 2;
+  font-family: var(--font-mono); font-size: 0.58rem;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  color: rgba(255,255,255,0.78); text-shadow: 0 1px 4px rgba(0,0,0,0.55);
+}
+/* ─── LEADERBOARD ─── */
+.lb-row {
+  display: grid; grid-template-columns: 2.75rem 1fr auto auto;
+  align-items: center; gap: 0.75rem 1rem;
+  padding: 0.9rem 1.5rem; border-bottom: 1px solid var(--border-subtle);
+}
+.lb-row:last-child { border-bottom: none; }
+.lb-head {
+  font-family: var(--font-display); font-size: 0.66rem; font-weight: 700;
+  letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--text-muted); padding: 0.7rem 1.5rem;
+}
+.lb-rank {
+  font-family: var(--font-display); font-weight: 800; font-size: 0.9rem;
+  color: var(--text-muted); text-align: center;
+}
+.lb-rank-badge {
+  width: 1.9rem; height: 1.9rem; margin: 0 auto;
+  border-radius: 50%; background: var(--teal); color: var(--navy-deep);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.82rem; font-weight: 800;
+}
+.lb-handle { font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; }
+.lb-port { font-size: 0.78rem; color: var(--text-muted); }
+.lb-num {
+  font-family: var(--font-mono); font-size: 0.88rem;
+  color: var(--text-secondary); text-align: right; min-width: 3.2rem;
+}
+.lb-note {
+  padding: 0.9rem 1.5rem; font-family: var(--font-display);
+  font-size: 0.78rem; color: var(--text-muted);
+  border-top: 1px solid var(--border-subtle); line-height: 1.6;
+}
+.lb-patch {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  margin-top: 0.3rem; padding: 0.14rem 0.55rem;
+  border: 1px solid var(--border-subtle); border-radius: 999px;
+  background: var(--surface-raised);
+  font-family: var(--font-display); font-size: 0.66rem; font-weight: 700;
+  letter-spacing: 0.03em; color: var(--text-muted);
+}
+.lb-patch .patch-dot { width: 7px; height: 7px; }
+.lb-patch.supporter { border-style: dashed; border-color: rgba(240,168,48,0.55); color: #F0A830; }
+/* ─── PROFILE ─── */
+.profile-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem; margin-bottom: 1.5rem;
+}
+@media (max-width: 500px) { .profile-stats { grid-template-columns: repeat(2, 1fr); } }
+.stat-card {
+  background: var(--surface-raised); border-radius: var(--radius-sm);
+  padding: 1.1rem 0.75rem; text-align: center;
+}
+.stat-num { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; color: var(--teal); }
+.stat-label {
+  font-family: var(--font-display); font-size: 0.63rem; font-weight: 600;
+  letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--text-muted); margin-top: 0.15rem;
+}
+/* sewn patches: navy felt + stitch rings, theme-independent (brand asset) */
+.patch-wall { display: flex; flex-wrap: wrap; gap: 1rem 1.4rem; }
+.patch-card { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.4rem; }
+.sewn-patch {
+  position: relative; width: 64px; height: 64px; border-radius: 50%;
+  background: #0f2038; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.sewn-patch .ring { position: absolute; inset: 0; border-radius: 50%; border: 3px solid var(--ring, #7AE8D1); }
+.sewn-patch .stitch { position: absolute; inset: 4px; border-radius: 50%; border: 1.3px dashed var(--ring, #7AE8D1); opacity: 0.85; }
+.sewn-patch.supporter .ring { border-style: dashed; }
+.sewn-glyph { position: relative; width: 32px; height: 32px; }
+.patch-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.patch-name { font-family: var(--font-display); font-size: 0.82rem; font-weight: 700; }
+.patch-sub {
+  font-family: var(--font-mono); font-size: 0.6rem;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--text-muted); margin-top: 0.1rem;
+}
+.pin-tag {
+  font-family: var(--font-mono); font-size: 0.58rem;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--teal); border: 1px solid var(--teal);
+  border-radius: 999px; padding: 0.08rem 0.45rem;
+}
+/* avatar with pinned mini-patch */
+.avatar {
+  position: relative; border-radius: 50%; background: #123152; color: #eaf1f5;
+  font-family: var(--font-display); font-weight: 800;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  border: 2px solid #0f2038; user-select: none;
+}
+.avatar-lg { width: 64px; height: 64px; font-size: 1.2rem; }
+.mini-patch {
+  position: absolute; left: -5px; bottom: -5px; width: 24px; height: 24px;
+  border-radius: 50%; background: #0f2038; border: 2px solid var(--ring, #7AE8D1);
+  box-shadow: 0 0 0 2.5px var(--surface);
+  display: flex; align-items: center; justify-content: center;
+}
+.mini-patch::after { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--ring, #7AE8D1); }
+/* leaderboard watcher column */
+.lb-who { display: flex; align-items: center; gap: 0.7rem; min-width: 0; }
+.lb-avatar { width: 38px; height: 38px; font-size: 0.72rem; }
+.lb-patch-row { display: flex; align-items: center; gap: 0.55rem; flex-wrap: wrap; margin-top: 0.3rem; }
+.lb-pw-link {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-family: var(--font-display); font-size: 0.66rem; font-weight: 700;
+  letter-spacing: 0.03em; color: var(--teal);
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.pin-demo { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem; }
+.pin-demo p { font-size: 0.82rem; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+/* photo upload drop zone (gallery) */
+.photo-drop {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1.6rem 1.2rem; text-align: center;
+  background: var(--surface-raised);
+}
+.photo-drop-title { font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; margin-top: 0.6rem; }
+.photo-drop-sub { font-family: var(--font-display); font-size: 0.72rem; color: var(--text-muted); margin-top: 0.3rem; line-height: 1.5; }
+/* floating prototype disclaimer */
+.proto-badge {
+  position: fixed; bottom: 1rem; right: 1rem; z-index: 1500;
+  display: flex; align-items: flex-start; gap: 0.5rem;
+  background: var(--surface-overlay); backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle); border-radius: 999px;
+  box-shadow: var(--shadow);
+  padding: 0.5rem 0.9rem;
+  font-family: var(--font-display); font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.02em; color: var(--text-secondary);
+  max-width: 330px; line-height: 1.45;
+}
+.proto-badge-close {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-muted); font-size: 0.95rem; line-height: 1;
+  padding: 0.05rem 0 0 0.1rem; flex-shrink: 0;
+}
+.proto-badge-close:hover { color: var(--text-primary); }
+/* patch wall viewer modal */
+.pw-overlay {
+  position: fixed; inset: 0; background: rgba(4,10,18,0.55); z-index: 2000;
+  display: none; align-items: center; justify-content: center; padding: 1rem;
+}
+.pw-overlay.open { display: flex; }
+.pw-panel {
+  background: var(--surface-overlay); backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle); border-radius: var(--radius);
+  box-shadow: var(--shadow); max-width: 440px; width: 100%;
+  padding: 1.5rem 1.6rem; position: relative; max-height: 85vh; overflow-y: auto;
+}
+.pw-close {
+  position: absolute; top: 0.7rem; right: 0.85rem;
+  background: none; border: none; cursor: pointer;
+  font-family: var(--font-display); font-size: 1rem; color: var(--text-muted);
+  line-height: 1; padding: 0.2rem;
+}
+.pw-close:hover { color: var(--text-primary); }
+.pw-handle { font-family: var(--font-display); font-weight: 800; font-size: 1.1rem; }
+.pw-sub { font-family: var(--font-display); font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem; }
+.pw-grid { display: flex; flex-wrap: wrap; gap: 0.9rem 1rem; margin-top: 1.1rem; }
+.pw-private {
+  margin-top: 1.1rem; padding: 1.1rem; border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;
+}
+.sighting-row {
+  display: flex; align-items: center; gap: 0.9rem;
+  padding: 0.8rem 0; border-bottom: 1px solid var(--border-subtle);
+}
+.sighting-row:last-child { border-bottom: none; padding-bottom: 0; }
+.sighting-what { font-family: var(--font-display); font-size: 0.88rem; font-weight: 700; }
+.sighting-where { font-size: 0.78rem; color: var(--text-muted); }
+.sighting-date {
+  margin-left: auto; font-family: var(--font-mono);
+  font-size: 0.7rem; color: var(--text-secondary); white-space: nowrap;
+}
+.empty-photo {
+  position: relative; min-height: 280px;
+  border-radius: var(--radius-lg); overflow: hidden;
+  background: linear-gradient(135deg, #0f2038, #7AE8D1);
+}
+.empty-line {
+  position: absolute; left: 1.5rem; bottom: 1.2rem; right: 1.5rem;
+  color: #fff; text-shadow: 0 1px 14px rgba(0,0,0,0.65);
+}
+.empty-line-main { font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; }
+.empty-line-sub { font-size: 0.85rem; opacity: 0.92; margin-top: 0.2rem; }
+/* no hanging words: widows & orphans */
+p, li, blockquote { text-wrap: pretty; }
+h1, h2, h3, h4, .section-title, .hero-sub1, .hero-sub2 { text-wrap: balance; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ NAV ═══════════ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" onclick="showPage('home')">
+      Alaska Marine Animal Watch
+    </a>
+    <div class="nav-links" id="navLinks">
+      <button class="nav-link active" onclick="showPage('home')">Home</button>
+      <div class="nav-item">
+        <button class="nav-link nav-parent" onclick="toggleReporting(event)" aria-expanded="false" aria-haspopup="true">
+          Reporting
+          <svg class="nav-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="nav-dropdown">
+          <button class="nav-link" onclick="showPage('sighting')">Report a Sighting</button>
+          <button class="nav-link" onclick="showPage('violation')">Report a Concern</button>
+        </div>
+      </div>
+      <button class="nav-link" onclick="showPage('map')">Sighting Map</button>
+      <button class="nav-link" onclick="showPage('gallery')">Gallery</button>
+      <button class="nav-link" onclick="showPage('leaderboard')">Leaderboard</button>
+      <button class="nav-link" onclick="showPage('profile')">Profile</button>
+      <button class="nav-link" onclick="showPage('why')">Our Mission</button>
+      <button class="nav-link" onclick="showPage('about')">About</button>
+    </div>
+    <div class="nav-actions">
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" aria-label="Switch to dark mode">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════ HOME ═══════════ -->
+<div class="page active" id="page-home">
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-waves"></div>
+    <div class="hero-content">
+        <h1 class="hero-title"> Alaska Marine Animal Watch<br>
+          <span class="hero-sub2">Community Wildlife Interactions - Southeast Alaska</span>
+      </h1>
+      <p class="hero-tagline">"See something on the water? Share it here!"</p>
+      <p class="hero-desc">
+        Built for community scientists, researchers, recreational boaters, fishermen, wildlife enthusiasts, or anyone on the water in Southeast Alaska.
+      </p>
+      <div class="hero-ctas">
+        <button class="btn btn-primary" onclick="showPage('sighting')">
+          Report a Sighting
+        </button>
+        <button class="btn btn-secondary" onclick="showPage('map')">
+          Explore the Map
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick explainer cards -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-label">How It Works</div>
+      <h2 class="section-title">Stewardship Through Action</h2>
+      <p class="section-subtitle">
+        Whether you're a charter captain, a kayaker, a ferry passenger, a naturalist, or just someone who happened to be on the water, your sighting matters!
+      </p>
+    </div>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:1.25rem; text-align:center;">
+      <div class="info-card" style="padding:1.75rem;">
+        <div style="color:var(--teal); margin-bottom:0.6rem;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <h3 style="color:var(--text-primary); font-size:1rem; margin:0 0 0.5rem;">Report What You See</h3>
+        <p style="font-size:0.9rem; margin:0;">Log the species, location, and behavior in under two minutes. We're interested in all marine animals. No account needed!</p>
+      </div>
+      <div class="info-card" style="padding:1.75rem;">
+        <div style="color:var(--teal); margin-bottom:0.6rem;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <h3 style="color:var(--text-primary); font-size:1rem; margin:0 0 0.5rem;">Map the Data</h3>
+        <p style="font-size:0.9rem; margin:0;">Every sighting gets pinned on a live map — building a real-time picture of wildlife activity across the region for everyone to see.</p>
+      </div>
+      <div class="info-card" style="padding:1.75rem;">
+        <div style="color:var(--teal); margin-bottom:0.6rem;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <h3 style="color:var(--text-primary); font-size:1rem; margin:0 0 0.5rem;">Open to Everyone</h3>
+        <p style="font-size:0.9rem; margin:0;">Every sighting is publicly visible on the map and available to download. Anyone who wants to can use the data for free.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════ SIGHTING FORM ═══════════ -->
+<div class="page form-page" id="page-sighting">
+  <div class="form-container">
+    <div class="section-header" style="margin-bottom:2rem;">
+      <div class="section-label">Reporting</div>
+      <h2 class="section-title">Log a Marine Animal Sighting</h2>
+      <p class="section-subtitle">You do not need to create an account to report a sighting. Your name and contact info are always kept private. Share your observation and it'll appear on the map! </p>
+    </div>
+    <div class="form-card" id="sightingFormCard">
+      <form id="sightingForm" onsubmit="submitSighting(event)">
+        <div class="form-group">
+          <label class="form-label">Species *</label>
+          <select class="form-select" name="species" required>
+            <option value="">Select species</option>
+            <option>Humpback Whale</option>
+            <option>Orca / Killer Whale</option>
+            <option>Steller Sea Lion</option>
+            <option>Harbor Seal</option>
+            <option>Dall's Porpoise</option>
+            <option>Harbor Porpoise</option>
+            <option>Sea Otter</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group" id="otherSpeciesGroup" style="display:none;">
+          <label class="form-label">What species did you see?</label>
+          <input class="form-input" name="species_other" placeholder="e.g. Minke whale, Pacific white-sided dolphin">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Number of Animals *</label>
+            <input class="form-input" type="number" name="count" min="1" required placeholder="e.g. 3">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Behavior Observed *</label>
+            <select class="form-select" name="behavior" required>
+              <option value="">Select behavior</option>
+              <option>Feeding</option>
+              <option>Breaching</option>
+              <option>Resting</option>
+              <option>Traveling</option>
+              <option>With calf</option>
+              <option>Unknown</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Location Name *</label>
+          <input class="form-input" name="location" required placeholder="e.g. Point Retreat, north of Juneau">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Latitude <span class="optional">(optional)</span></label>
+            <input class="form-input" type="text" name="latitude" placeholder="e.g. 58.3005">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Longitude <span class="optional">(optional)</span></label>
+            <input class="form-input" type="text" name="longitude" placeholder="e.g. -134.4197">
+          </div>
+        </div>
+        <small style="display:block; margin:-0.9rem 0 1.4rem; font-size:0.78rem; color:var(--text-muted); font-family:var(--font-display);">
+          In the app, these are filled in automatically from your device's GPS — typing them by hand is just for this web preview.
+        </small>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Date *</label>
+            <input class="form-input" type="date" name="date" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Time *</label>
+            <input class="form-input" type="time" name="time" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">How many boats are near this group right now?</label>
+          <select class="form-select" name="vessel_count">
+            <option value="0">None visible</option>
+            <option value="1">1–2 boats</option>
+            <option value="3">3–5 boats</option>
+            <option value="6">6–10 boats</option>
+            <option value="10">10+ boats</option>
+          </select>
+          <small style="display:block; margin-top:0.35rem; font-size:0.78rem; color:var(--text-muted); font-family:var(--font-display);">
+            Helps other operators avoid crowding the same group.
+          </small>
+        </div>
+        <div class="form-group" style="background:rgba(30,119,175,0.05); border:1px solid rgba(30,119,175,0.15); border-radius:var(--radius-sm); padding:1rem 1.25rem; margin-bottom:1.5rem; margin-top:0;">
+          <label class="form-label">Photo <span class="optional">(optional)</span></label>
+          <div class="photo-drop">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <div class="photo-drop-title">Add your photo</div>
+            <div class="photo-drop-sub">JPEG or PNG, up to 10 MB — no identifiable people or vessels.</div>
+          </div>
+          <div class="toggle-group" style="margin-top:0.7rem;">
+            <button type="button" class="toggle-option" data-group="photo_consent" data-value="credit" onclick="setToggle(this);updatePhotoNote(this,'photoNoteSighting')">Use with credit</button>
+            <button type="button" class="toggle-option" data-group="photo_consent" data-value="anonymous" onclick="setToggle(this);updatePhotoNote(this,'photoNoteSighting')">Use anonymously</button>
+            <button type="button" class="toggle-option active" data-group="photo_consent" data-value="private" onclick="setToggle(this);updatePhotoNote(this,'photoNoteSighting')">Just my logbook</button>
+          </div>
+          <input type="hidden" name="photo_consent" value="private">
+          <small id="photoNoteSighting" style="display:block; margin-top:0.4rem; font-size:0.78rem; color:var(--text-muted); font-family:var(--font-display); line-height:1.6;">
+            Keeps this photo private to your logbook — we never feature it. You can change your mind on any photo, any time.
+          </small>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Your Name <span class="optional">(optional)</span> <span class="private">Private</span></label>
+            <input class="form-input" name="reporter_name" placeholder="Name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email * <span class="private">Private</span></label>
+            <input class="form-input" type="email" name="reporter_email" required placeholder="email@example.com">
+            <small style="display:block; margin-top:0.35rem; font-size:0.78rem; color:var(--text-muted); font-family:var(--font-display);">
+              Required so there's a record of the report. Only used if we need to follow up. Never shared or displayed publicly.
+            </small>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">May we follow up with you about this sighting?</label>
+          <div class="toggle-group">
+            <button type="button" class="toggle-option active" data-group="followup_ok" data-value="yes" onclick="setToggle(this)">Yes, happy to help</button>
+            <button type="button" class="toggle-option" data-group="followup_ok" data-value="no" onclick="setToggle(this)">No thanks</button>
+          </div>
+          <small style="display:block; margin-top:0.4rem; font-size:0.78rem; color:var(--text-muted); font-family:var(--font-display);">
+            Occasionally we or a researcher may want to learn more about what you saw.
+          </small>
+          <input type="hidden" name="followup_ok" value="yes">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes <span class="optional">(optional)</span></label>
+          <textarea class="form-textarea" name="notes" placeholder="Any additional observations — water conditions, other wildlife, vessel behavior, etc."></textarea>
+          <div class="toggle-group" style="margin-top:0.6rem;">
+            <button type="button" class="toggle-option active" data-group="notes_public" data-value="shared" onclick="setToggle(this)">Share with the community</button>
+            <button type="button" class="toggle-option" data-group="notes_public" data-value="private" onclick="setToggle(this)">Keep private</button>
+          </div>
+          <input type="hidden" name="notes_public" value="shared">
+          <small style="display:block; margin-top:0.4rem; font-size:0.78rem; color:var(--text-muted); font-family:var(--font-display);">
+            Shared notes appear as a field note on this sighting's public discussion, credited to your handle. Private notes go to the research record only.
+          </small>
+        </div>
+        <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true" tabindex="-1">
+          <label for="wake_confirm_s">Leave this empty</label>
+          <input type="text" id="wake_confirm_s" name="wake_confirm" tabindex="-1" autocomplete="off">
+        </div>
+        <div class="form-submit">
+          <button type="submit" class="btn btn-primary">Submit Sighting Report</button>
+        </div>
+      </form>
+    </div>
+    <div class="form-success" id="sightingSuccess">
+      <div class="form-success-icon"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12.5l2.5 2.5 5-6"/></svg></div>
+      <h3>Sighting Reported</h3>
+      <p>Your sighting has been recorded. It'll appear on the map within 24 hours. Thank you for sharing what you saw.</p>
+      <div style="margin-bottom:0.75rem;">
+        <button onclick="shareSighting()" style="display:flex;align-items:center;gap:0.5rem;justify-content:center;width:100%;cursor:pointer;" class="btn btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          Share Your Sighting
+        </button>
+      </div>
+      <button class="btn btn-secondary" onclick="resetSightingForm()">Submit Another</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ VIOLATION FORM ═══════════ -->
+<div class="page form-page" id="page-violation">
+  <div class="form-container">
+    <div class="section-header" style="margin-bottom:2rem;">
+      <div class="section-label">Report a Concern</div>
+      <h2 class="section-title">Report a Vessel Concern</h2>
+      <p class="section-subtitle">If you saw something concerning, you can document it here. Reports are always confidential, never displayed publicly, and never shared without your permission.</p>
+    </div>
+    <div class="form-card" id="violationFormCard">
+      <form id="violationForm" onsubmit="submitViolation(event)">
+        <div class="form-group">
+          <label class="form-label">Violation Type *</label>
+          <select class="form-select" name="violation_type" required>
+            <option value="">Select violation type</option>
+            <option>Too close to marine mammal</option>
+            <option>Approached from wrong angle</option>
+            <option>Excessive speed near wildlife</option>
+            <option>Harassment behavior</option>
+            <option>Feeding wildlife</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group" id="otherViolationGroup" style="display:none;">
+          <label class="form-label">Please describe the concern</label>
+          <input class="form-input" name="violation_type_other" placeholder="e.g. Wake damage near hauled-out seals">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Species Involved *</label>
+          <select class="form-select" name="species" required>
+            <option value="">Select species</option>
+            <option>Humpback Whale</option>
+            <option>Orca / Killer Whale</option>
+            <option>Steller Sea Lion</option>
+            <option>Harbor Seal</option>
+            <option>Dall's Porpoise</option>
+            <option>Harbor Porpoise</option>
+            <option>Sea Otter</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Vessel Description *</label>
+          <input class="form-input" name="vessel_description" required placeholder="Type, color, name or registration number if visible">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Location *</label>
+          <input class="form-input" name="location" required placeholder="e.g. Auke Bay, near Channel Island">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Latitude <span class="optional">(optional)</span></label>
+            <input class="form-input" type="text" name="latitude" placeholder="e.g. 58.3815">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Longitude <span class="optional">(optional)</span></label>
+            <input class="form-input" type="text" name="longitude" placeholder="e.g. -134.7390">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Date *</label>
+            <input class="form-input" type="date" name="date" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Time *</label>
+            <input class="form-input" type="time" name="time" required>
+          </div>
+        </div>
+        <div class="form-group" style="background:rgba(240,168,48,0.05); border:1px solid rgba(240,168,48,0.15); border-radius:var(--radius-sm); padding:1rem 1.25rem; margin-bottom:1.5rem; margin-top:0;">
+          <label class="form-label">Photo or video <span class="optional">(optional)</span> <span class="private">Private</span></label>
+          <div class="photo-drop">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <div class="photo-drop-title">Add your photo or video</div>
+            <div class="photo-drop-sub">JPEG, PNG, or MP4, up to 50 MB — visual evidence is the most useful thing you can provide.</div>
+          </div>
+          <small style="display:block; margin-top:0.5rem; font-size:0.78rem; color:var(--text-muted); font-family:var(--font-display); line-height:1.6;">
+            Attached evidence goes to the review team only — never displayed publicly, never used in the gallery, never attached to your name unless you chose an attributed statement above.
+          </small>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Did you report to NOAA or Coast Guard?</label>
+          <div class="toggle-group">
+            <button type="button" class="toggle-option" data-group="reported_noaa" data-value="Yes" onclick="setToggle(this)">Yes</button>
+            <button type="button" class="toggle-option active" data-group="reported_noaa" data-value="No" onclick="setToggle(this)">No</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Report type</label>
+          <div class="toggle-group" style="flex-direction:column;">
+            <button type="button" class="toggle-option active" data-group="statement_type" data-value="anonymous" onclick="setToggle(this)">Anonymous observation</button>
+            <button type="button" class="toggle-option" data-group="statement_type" data-value="attributed" onclick="setToggle(this)">Attributed statement (my name can be shared with NOAA)</button>
+          </div>
+          <small style="display:block; margin-top:0.4rem; font-size:0.78rem; color:var(--text-muted); font-family:var(--font-display);">
+            Anonymous reports help identify patterns. Attributed statements carry more weight with enforcement agencies.
+          </small>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="display:flex; align-items:flex-start; gap:0.5rem; cursor:pointer;">
+            <input type="checkbox" name="noaa_batch_consent" style="accent-color:var(--teal); margin-top:0.2rem; flex-shrink:0;">
+            <span>I consent to this report being included in an end-of-season batch submission to NOAA Office of Law Enforcement for pattern analysis. <span class="private">Private</span></span>
+          </label>
+          <small style="display:block; margin-top:0.35rem; font-size:0.78rem; color:var(--text-muted); font-family:var(--font-display);">
+            Reports are submitted collectively, not individually. Your identity is shared only if you selected "Attributed statement" above.
+          </small>
+        </div>
+        <div class="form-group">
+          <label class="form-label">May we contact you to follow up and gather more information? <span class="private">Private</span></label>
+          <div class="toggle-group">
+            <button type="button" class="toggle-option" data-group="ok_to_contact" data-value="Yes" onclick="setToggle(this)">Yes</button>
+            <button type="button" class="toggle-option active" data-group="ok_to_contact" data-value="No" onclick="setToggle(this)">No</button>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Your Name <span class="optional">(optional)</span> <span class="private">Private</span></label>
+            <input class="form-input" name="reporter_name" placeholder="Name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email <span class="private">Private</span></label>
+            <input class="form-input" type="email" name="reporter_email" required placeholder="email@example.com">
+            <small style="display:block; margin-top:0.35rem; font-size:0.78rem; color:var(--text-muted); font-family:var(--font-display);">
+              Required so we can follow up if needed. Never shared or displayed publicly.
+            </small>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes <span class="optional">(optional)</span></label>
+          <textarea class="form-textarea" name="notes" placeholder="Describe the incident — what happened, how close was the vessel, how did the animal(s) react?"></textarea>
+          <small style="display:block; margin-top:0.4rem; font-size:0.78rem; color:var(--text-muted); font-family:var(--font-display);">
+            Concern notes are always private — they go to the review team only, never to the public map or discussion.
+          </small>
+        </div>
+        <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true" tabindex="-1">
+          <label for="wake_confirm_v">Leave this empty</label>
+          <input type="text" id="wake_confirm_v" name="wake_confirm" tabindex="-1" autocomplete="off">
+        </div>
+        <div class="form-submit">
+          <button type="submit" class="btn btn-coral">Submit Violation Report</button>
+        </div>
+      </form>
+    </div>
+    <div class="form-success" id="violationSuccess">
+      <div class="form-success-icon"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12.5l2.5 2.5 5-6"/></svg></div>
+      <h3>Concern Reported</h3>
+      <p>Your report has been recorded and will stay confidential. Thank you for documenting it.</p>
+      <button class="btn btn-secondary" onclick="resetViolationForm()">Submit Another</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MAP ═══════════ -->
+<div class="page map-page" id="page-map">
+  <div class="map-container">
+    <div class="section-header" style="padding-top:1.5rem;">
+      <div class="section-label">Explore</div>
+      <h2 class="section-title">Sighting Map</h2>
+      <p class="section-subtitle">Live reports from across Southeast Alaska. Species, location, and behavior. Optional overalys like AIS and real-time weather conditions available in the menu. </p>
+      <div id="dataSourceBadge" class="data-badge data-badge-sample">○ Sample Data (prototype)</div>
+    </div>
+    <div class="map-wrapper">
+      <div class="map-sidebar">
+        <div class="map-stats" style="margin-top:0; margin-bottom:1rem;">
+          <div class="map-stat">
+            <div class="map-stat-num" id="totalSightings">0</div>
+            <div class="map-stat-label">Sightings</div>
+          </div>
+          <div class="map-stat">
+            <div class="map-stat-num" id="totalSpecies">0</div>
+            <div class="map-stat-label">Species</div>
+          </div>
+        </div>
+        <h3>Filters</h3>
+        <div class="filter-group">
+          <div class="filter-label">Map Layers</div>
+          <div class="toggle-group" id="baseMapGroup" style="margin-bottom:0.55rem;">
+            <button type="button" class="toggle-option" data-value="chart" onclick="setBaseMap(this)">Chart</button>
+            <button type="button" class="toggle-option active" data-value="satellite" onclick="setBaseMap(this)">Satellite</button>
+          </div>
+          <div class="filter-checks">
+            <label class="filter-check"><input type="checkbox" onchange="toggleAIS(this.checked)"> AIS vessel traffic</label>
+            <label class="filter-check"><input type="checkbox" onchange="toggleWind(this.checked)"> Wind</label>
+          </div>
+          <small style="display:block; margin-top:0.5rem; font-family:var(--font-display); font-size:0.66rem; line-height:1.5; color:var(--text-muted);">
+            Prototype shows sample traffic and wind. Live overlays will have current information. Not for navigation.
+          </small>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Species</div>
+          <div class="filter-checks" id="speciesFilters"></div>
+        </div>
+        <button onclick="clearAllFilters()" style="background:none; border:none; color:var(--teal); font-family:var(--font-display); font-size:0.78rem; font-weight:500; cursor:pointer; margin:-0.4rem 0 1.25rem; padding:0.25rem 0; width:100%; text-align:center;">Clear Filters</button>
+        <div class="filter-group">
+          <div class="filter-label">Nearby Area</div>
+          <select class="form-select" id="areaFilter" onchange="applyFilters()" style="font-size:0.82rem; padding:0.5rem 0.75rem;">
+            <option value="">All Areas</option>
+            <option value="juneau">Juneau / Douglas</option>
+            <option value="sitka">Sitka</option>
+            <option value="ketchikan">Ketchikan</option>
+            <option value="petersburg">Petersburg</option>
+            <option value="wrangell">Wrangell</option>
+            <option value="gustavus">Gustavus / Glacier Bay</option>
+            <option value="haines">Haines</option>
+            <option value="skagway">Skagway</option>
+            <option value="angoon">Angoon</option>
+            <option value="craig">Craig / Prince of Wales</option>
+            <option value="yakutat">Yakutat</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Time Window</div>
+          <input type="range" id="timeSlider" min="0" max="5" value="5" step="1"
+                 oninput="setTimeSlider(this.value)"
+                 style="width:100%; accent-color:var(--teal); cursor:pointer;">
+          <div id="timeSliderLabel" style="font-family:var(--font-display); font-size:0.78rem; color:var(--text-secondary); text-align:center; margin-top:0.35rem;">All Time</div>
+        </div>
+        <div class="filter-group" style="margin-bottom:0.75rem;">
+          <div class="filter-label">Freshness</div>
+          <div style="display:flex; flex-direction:column; gap:0.3rem;">
+            <div style="display:flex; align-items:center; gap:0.5rem; font-family:var(--font-display); font-size:0.72rem; color:var(--text-muted);">
+              <span style="width:10px;height:10px;border-radius:50%;background:var(--teal);opacity:1;flex-shrink:0;"></span> Today
+            </div>
+            <div style="display:flex; align-items:center; gap:0.5rem; font-family:var(--font-display); font-size:0.72rem; color:var(--text-muted);">
+              <span style="width:10px;height:10px;border-radius:50%;background:var(--teal);opacity:0.6;flex-shrink:0;"></span> This week
+            </div>
+            <div style="display:flex; align-items:center; gap:0.5rem; font-family:var(--font-display); font-size:0.72rem; color:var(--text-muted);">
+              <span style="width:10px;height:10px;border-radius:50%;background:var(--teal);opacity:0.25;flex-shrink:0;"></span> Older
+            </div>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Vessel Density</div>
+          <div class="toggle-group" style="flex-direction:column;" id="vesselGroup">
+            <button type="button" class="toggle-option active" data-value="any" onclick="setVesselFilter(this)">Any</button>
+            <button type="button" class="toggle-option" data-value="crowded" onclick="setVesselFilter(this)"><span style="width:8px;height:8px;border-radius:50%;background:#e8634a;display:inline-block;margin-right:0.4rem;vertical-align:middle;"></span>Crowded (6+)</button>
+            <button type="button" class="toggle-option" data-value="moderate" onclick="setVesselFilter(this)"><span style="width:8px;height:8px;border-radius:50%;background:#f0a830;display:inline-block;margin-right:0.4rem;vertical-align:middle;"></span>Moderate (3–5)</button>
+            <button type="button" class="toggle-option" data-value="quiet" onclick="setVesselFilter(this)"><span style="width:8px;height:8px;border-radius:50%;background:#00c9b1;display:inline-block;margin-right:0.4rem;vertical-align:middle;"></span>Quiet (0–2)</button>
+          </div>
+        </div>
+      </div>
+      <div id="sighting-map"></div>
+    </div>
+    <div class="download-bar">
+      <button class="btn btn-coral btn-sm" onclick="showPage('violation')">Report a Concern</button>
+      <button class="btn btn-secondary btn-sm" onclick="downloadCSV()">Download CWI Data (CSV)</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ WHY IT MATTERS ═══════════ -->
+<div class="page info-page" id="page-why">
+  <div class="info-section">
+    <div class="section-header">
+      <div class="section-label">Why It Matters</div>
+      <h2 class="section-title">Our Mission</h2>
+    </div>
+    <div class="info-card">
+      <h2>Stewardship Through Action</h2>
+      <p>
+        Southeast Alaska is one of the richest marine mammal corridors on Earth — humpback whales, orcas, Steller sea lions, harbor seals, Dall's porpoises, and sea otters move through these waters every day. But there's no coordinated, community-based effort to document what's happening out there. Lots of eyes on the water, but no way to share what they see.
+      </p>
+      <p>
+        Alaska Marine Animal Watch changes that. Every sighting shared adds to an open record that builds a real picture of wildlife in the region. And the data belongs to everyone: researchers, students, educators, tribal resource managers, journalists, and curious people.
+      </p>
+      <p>
+        You don't need to be a scientist or even have an account! You just need to be on the water.
+      </p>
+
+      <h3>Alaska's Marine Mammal Regulations</h3>
+      <p>Federal and state regulations set minimum approach distances to protect marine mammals from vessel disturbance:</p>
+      <div class="reg-highlight">
+        <div class="reg-box">
+          <div class="distance">100 yds</div>
+          <div class="species-label">Humpback Whales</div>
+          <div class="reg-note">NOAA approach regulation for all vessels in Alaska waters</div>
+        </div>
+        <div class="reg-box">
+          <div class="distance">100 yds</div>
+          <div class="species-label">Orcas / Killer Whales</div>
+          <div class="reg-note">Federal MMPA protection applies</div>
+        </div>
+        <div class="reg-box">
+          <div class="distance">300 ft</div>
+          <div class="species-label">Sea Otters</div>
+          <div class="reg-note">USFWS recommended minimum distance</div>
+        </div>
+      </div>
+      <p>
+        Many boaters — particularly visitors — don't know these rules exist. Alaska Marine Animal Watch data helps identify where violations are most common, giving agencies and educators the evidence they need to focus their efforts.
+      </p>
+
+      <h3>Open Data, No Gatekeeping</h3>
+      <p>
+        Every sighting on Alaska Marine Animal Watch is publicly visible and free to download. The CWI record includes species, count, behavior, location, and date. Researchers, students, agencies, and journalists can use it without fees, agreements, or approval. We built it for the community — if the data is useful to you, take it and use it! That's what it's for.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ ABOUT ═══════════ -->
+<div class="page info-page" id="page-about">
+  <div class="info-section">
+    <div class="section-header">
+      <div class="section-label">About Alaska Marine Animal Watch</div>
+      <h2 class="section-title">About Alaska Marine Animal Watch</h2>
+    </div>
+    <div class="info-card">
+      <h2>What Is Alaska Marine Animal Watch?</h2>
+      <p>
+        Alaska Marine Animal Watch is a free, community-driven app for logging marine mammal sightings and reporting potential incidents across Southeast Alaska. By turning everyday encounters on the water into a living map, we help people watch and enjoy wildlife more responsibly. Built in Juneau, for the whole region.
+      </p>
+    </div>
+    <div class="info-card">
+      <h2>How We Use AI</h2>
+      <p>
+        Alaska Marine Animal Watch is built with AI assistance. Our coding assistant is <a href="https://mistral.ai/about/" target="_blank" rel="noopener noreferrer" style="color:var(--teal); font-weight:700;"><strong>Vibe</strong></a>, made by <strong>Mistral AI</strong> — an independent AI company based in Paris, France.
+      </p>
+      <p>
+        What this means in practice: AI helps write and refine this platform's code, under human direction. It does not decide what we build, how we moderate, or what happens to your data. Every product, privacy, and community decision here is made by a person. Your sightings, photos, and reports are not used to train anyone's AI.
+      </p>
+      <p>
+        Questions about our use of AI? Ask us directly:
+        <a href="mailto:hello@alaskamarineanimalwatch.com" style="color:var(--teal); text-decoration:none; font-family:var(--font-display); font-weight:600;">hello@alaskamarineanimalwatch.com</a>
+      </p>
+    </div>
+    <div class="info-card">
+      <h2>Community Guidelines</h2>
+      <p>
+        Alaska Marine Animal Watch is a moderated community. Moderation doesn't mean censorship, but it's how the record stays worth trusting. Three rules cover most everything:
+      </p>
+      <h3>1. Be Polite on the Water, Be Polite Here</h3>
+      <p>
+        Guides, fishermen, researchers, and first-time visitors to Alaska all read this record. No harassment, no personal attacks, no ganging up. Disagree with a sighting report if you have better facts — never with the person. Violators will be removed from the community.
+      </p>
+      <h3>2. Describe the Behavior, Don't Accuse</h3>
+      <p>
+        Public accusations are a legal risk to the community. If you believe a marine mammal was disturbed, report it through the private concern pipeline, where trained reviewers handle it properly. Personal attacks will result in removal from the community.
+      </p>
+      <h3>3. Report, Don't Reply</h3>
+      <p>
+        If you see someone breaking these rules, use the report link on any sighting discussion — don't start an argument in the thread. A moderator reviews every report. When we remove something or someone, we tell the person why. Enforcement is the same for everyone.
+      </p>
+      <p>
+        Reports are confidential. Your information is never shared without your permission.
+      </p>
+    </div>
+    <div class="info-card">
+      <h2>How We Operate</h2>
+      <h3>A For-Profit, Transparent Model</h3>
+      <p>
+        Alaska Marine Animal Watch is an independently operated, for-profit project. This means we run lean, we move fast, and we don't answer to a board.
+      </p>
+      <p>
+        Revenue from Alaska Marine Animal Watch — through partnerships, data services, and supporter contributions — funds the platform's operation and development. We don't sell your information and we don't restrict access based on finances.
+      </p>
+      <p>
+        We believe the best way to protect Southeast Alaska's marine ecosystem is to put real data in the hands of the people who can use it. The full CWI record — species, location, behavior, count, and date — is publicly downloadable from the map page. No fees and no gatekeeping.
+      </p>
+
+      <h3>How the Data Flows</h3>
+      <p>
+        When you submit a sighting, the report routes to a secure database. A public tab containing only species, location, behavior, date, and animal count feeds the sighting map in near real-time. Your name and contact information stay in a private tab that only Alaska Marine Animal Watch administrators can access.
+        
+        <p>Concern reports follow a separate, fully private pipeline — never published or displayed on the map. Reporter identity on all concern reports is always confidential.</p>
+      </p>
+      <p style="margin-top:1.25rem; padding-top:1.25rem; border-top:1px solid var(--border-subtle);">
+        <span style="font-family:var(--font-display); font-weight:600; color:var(--text-primary);">Media Inquiries, Research Partnerships, and Data Requests:</span>
+        <a href="mailto:hello@alaskamarineanimalwatch.com" style="color:var(--teal); text-decoration:none; margin-left:0.35rem; font-family:var(--font-display); font-weight:600;">hello@alaskamarineanimalwatch.com</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ GALLERY ═══════════ -->
+<div class="page info-page" id="page-gallery">
+  <div class="section" style="max-width:1000px;">
+    <div class="section-header">
+      <div class="section-label">Community</div>
+      <h2 class="section-title">Sighting Gallery</h2>
+      <p class="section-subtitle">Photos shared by people on the water across Southeast Alaska. All photos are shared voluntarily with the photographer's permission.</p>
+    </div>
+
+    <div class="gallery-grid">
+      <div class="gallery-card">
+        <div class="gallery-img" style="background:linear-gradient(135deg, #0f2038, #7AE8D1);">
+          <span class="gallery-dot" style="background:#7AE8D1;"></span>
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Humpback_whale_bubble_net_feeding_Christin_Khan_NOAA.jpg?width=900" alt="Humpback whale lunging through a bubble net" loading="lazy" onerror="this.remove()">
+          <span class="photo-credit">NOAA · public domain</span>
+        </div>
+        <div class="gallery-body">
+          <div class="gallery-species">Humpback Whale</div>
+          <div class="gallery-meta">Point Retreat, Lynn Canal · Apr 22, 2026</div>
+          <div class="gallery-caption">Bubble-net feeding group of four. Incredible to watch them surface together — the gulls were going wild overhead.</div>
+          <div class="gallery-credit">— Captain Dave, Juneau</div>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <div class="gallery-img" style="background:linear-gradient(135deg, #162d4a, #E8634A);">
+          <span class="gallery-dot" style="background:#E8634A;"></span>
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Orca_dorsalfin_NOAA.JPG?width=900" alt="Orca dorsal fin at the surface" loading="lazy" onerror="this.remove()">
+          <span class="photo-credit">NOAA Photo Library · public domain</span>
+        </div>
+        <div class="gallery-body">
+          <div class="gallery-species">Orca / Killer Whale</div>
+          <div class="gallery-meta">Icy Strait, near Gustavus · Apr 14, 2026</div>
+          <div class="gallery-caption">Pod of three moving south through Icy Strait. One juvenile breached twice. Clear skies, flat water.</div>
+          <div class="gallery-credit">— Anonymous contributor</div>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <div class="gallery-img" style="background:linear-gradient(135deg, #1e3a5f, #F0A830);">
+          <span class="gallery-dot" style="background:#F0A830;"></span>
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Seaotterrocks.jpg?width=900" alt="Sea otter resting near rocks" loading="lazy" onerror="this.remove()">
+          <span class="photo-credit">USFWS · public domain</span>
+        </div>
+        <div class="gallery-body">
+          <div class="gallery-species">Sea Otter</div>
+          <div class="gallery-meta">Sitka Sound, near Magic Island · Apr 19, 2026</div>
+          <div class="gallery-caption">Raft of eight otters — at least two mothers with pups. They were cracking shells and completely unbothered by the kayak.</div>
+          <div class="gallery-credit">— M.K., Sitka</div>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <div class="gallery-img" style="background:linear-gradient(135deg, #0a1628, #7AE8D1);">
+          <span class="gallery-dot" style="background:#7AE8D1;"></span>
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/HumpbackWhaleBreaching.jpg?width=900" alt="Humpback whale fully breaching" loading="lazy" onerror="this.remove()">
+          <span class="photo-credit">Wanetta Ayers · public domain</span>
+        </div>
+        <div class="gallery-body">
+          <div class="gallery-species">Humpback Whale</div>
+          <div class="gallery-meta">Frederick Sound · Apr 20, 2026</div>
+          <div class="gallery-caption">Full breach near Five Finger Lighthouse. The sound when it hit the water echoed off the mountains. Once-in-a-season moment.</div>
+          <div class="gallery-credit">— J.R., Petersburg</div>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <div class="gallery-img" style="background:linear-gradient(135deg, #162d4a, #4A5568);">
+          <span class="gallery-dot" style="background:#4A5568;"></span>
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Amak_Island%2C_Steller%27s_Sea_Lion_haul_out.jpg?width=900" alt="Steller sea lions hauled out on rocks" loading="lazy" onerror="this.remove()">
+          <span class="photo-credit">USFWS / Kevin Bell · public domain</span>
+        </div>
+        <div class="gallery-body">
+          <div class="gallery-species">Steller Sea Lion</div>
+          <div class="gallery-meta">Benjamin Island · Apr 21, 2026</div>
+          <div class="gallery-caption">At least 15 hauled out on the rocks. The big males were roaring at each other — you could hear them from 200 yards.</div>
+          <div class="gallery-credit">— Alaska Marine Animal Watch field team</div>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <div class="gallery-img" style="background:linear-gradient(135deg, #0f2038, #547492);">
+          <span class="gallery-dot" style="background:#547492;"></span>
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Dall%27s_porpoise_Alaska_2009_124.jpg?width=900" alt="Dall's porpoise at the surface" loading="lazy" onerror="this.remove()">
+          <span class="photo-credit">Nancy Heise · public domain</span>
+        </div>
+        <div class="gallery-body">
+          <div class="gallery-species">Dall's Porpoise</div>
+          <div class="gallery-meta">Stephens Passage · Apr 17, 2026</div>
+          <div class="gallery-caption">Group of twelve bow-riding for a good five minutes. Fast and playful — impossible to get a clean photo but I tried.</div>
+          <div class="gallery-credit">— Anonymous contributor</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <h3>Share Your Photos</h3>
+      <p class="section-subtitle" style="margin-bottom:1rem;">Your photos, your call. Upload from the app or right here — and choose exactly how we're allowed to use them.</p>
+      <div class="photo-drop">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <div class="photo-drop-title">Add your photo</div>
+        <div class="photo-drop-sub">JPEG or PNG, up to 10 MB — wildlife only, no identifiable people or vessels.</div>
+      </div>
+      <div class="form-group" style="margin-top:1.2rem; margin-bottom:0;">
+        <label class="form-label">How may we use your photo?</label>
+        <div class="toggle-group">
+          <button type="button" class="toggle-option" data-group="photo_consent" data-value="credit" onclick="setToggle(this);updatePhotoNote(this,'photoNoteGallery')">With credit</button>
+          <button type="button" class="toggle-option" data-group="photo_consent" data-value="anonymous" onclick="setToggle(this);updatePhotoNote(this,'photoNoteGallery')">Anonymously</button>
+          <button type="button" class="toggle-option active" data-group="photo_consent" data-value="private" onclick="setToggle(this);updatePhotoNote(this,'photoNoteGallery')">Just for me</button>
+        </div>
+        <small id="photoNoteGallery" style="display:block; margin-top:0.4rem; font-size:0.78rem; color:var(--text-muted); font-family:var(--font-display); line-height:1.6;">
+          Keeps it in your private logbook — we never feature it. You can change your mind on any photo, any time.
+        </small>
+      </div>
+    </div>
+
+    <div class="gallery-opt-in">
+      Still sharing on social? Tag <strong>#AlaskaMarineAnimalWatch</strong> on Instagram or TikTok — same rule there: we ask before featuring anything, and credit is always your choice.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ LEADERBOARD ═══════════ -->
+<div class="page info-page" id="page-leaderboard">
+  <div class="info-section">
+    <div class="section-header">
+      <div class="section-label">Community Sightings Leaderboard</div>
+      <h2 class="section-title">This Month's Contributors</h2>
+      <p class="section-subtitle">Curious about who's making the most sightings? This leaderboard shows the top contributors of the month! Public and private sightings are both counted.</p>
+    </div>
+    <div class="info-card" style="padding:0;">
+      <div class="lb-row lb-head">
+        <span style="text-align:center;">#</span><span>Watcher</span><span>Sightings</span><span>Streak</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-rank"><span class="lb-rank-badge">1</span></span>
+        <span class="lb-who">
+          <span class="avatar lb-avatar">TT<span class="mini-patch" style="--ring:#7AE8D1;"></span></span>
+          <span>
+            <div class="lb-handle">TidesWithTara</div><div class="lb-port">Auke Bay, Juneau</div>
+            <div class="lb-patch-row"><span class="lb-patch"><span class="patch-dot" style="background:#7AE8D1;"></span>Fluke ID Match</span><button type="button" class="lb-pw-link" onclick="openPatchWall('TidesWithTara')">Patch Wall →</button></div>
+          </span>
+        </span>
+        <span class="lb-num">14</span>
+        <span class="lb-num">9 days</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-rank"><span class="lb-rank-badge">2</span></span>
+        <span class="lb-who">
+          <span class="avatar lb-avatar">SS<span class="mini-patch" style="--ring:#E8634A;"></span></span>
+          <span>
+            <div class="lb-handle">SitkaSalt</div><div class="lb-port">Sitka</div>
+            <div class="lb-patch-row"><span class="lb-patch"><span class="patch-dot" style="background:#E8634A;"></span>First-of-Season Orca</span><button type="button" class="lb-pw-link" onclick="openPatchWall('SitkaSalt')">Patch Wall →</button></div>
+          </span>
+        </span>
+        <span class="lb-num">11</span>
+        <span class="lb-num">6 days</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-rank"><span class="lb-rank-badge">3</span></span>
+        <span class="lb-who">
+          <span class="avatar lb-avatar">FD<span class="mini-patch" style="--ring:#B5DBEC;"></span></span>
+          <span>
+            <div class="lb-handle">FerryDeckDave</div><div class="lb-port">Juneau</div>
+            <div class="lb-patch-row"><span class="lb-patch"><span class="patch-dot" style="background:#B5DBEC;"></span>Named-Pod Streak</span><button type="button" class="lb-pw-link" onclick="openPatchWall('FerryDeckDave')">Patch Wall →</button></div>
+          </span>
+        </span>
+        <span class="lb-num">9</span>
+        <span class="lb-num">4 days</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-rank">4</span>
+        <span class="lb-who">
+          <span class="avatar lb-avatar">KK<span class="mini-patch" style="--ring:#7AE8D1;"></span></span>
+          <span>
+            <div class="lb-handle">KelpForestKai</div><div class="lb-port">Ketchikan</div>
+            <div class="lb-patch-row"><span class="lb-patch"><span class="patch-dot" style="background:#7AE8D1;"></span>Fluke ID Match</span><button type="button" class="lb-pw-link" onclick="openPatchWall('KelpForestKai')">Patch Wall →</button></div>
+          </span>
+        </span>
+        <span class="lb-num">8</span>
+        <span class="lb-num">3 days</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-rank">5</span>
+        <span class="lb-who">
+          <span class="avatar lb-avatar">MM<span class="mini-patch" style="--ring:#E8634A;"></span></span>
+          <span>
+            <div class="lb-handle">MistyFjordMarla</div><div class="lb-port">Petersburg</div>
+            <div class="lb-patch-row"><span class="lb-patch"><span class="patch-dot" style="background:#E8634A;"></span>First-of-Season Orca</span><button type="button" class="lb-pw-link" onclick="openPatchWall('MistyFjordMarla')">Patch Wall →</button></div>
+          </span>
+        </span>
+        <span class="lb-num">7</span>
+        <span class="lb-num">2 days</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-rank">6</span>
+        <span class="lb-who">
+          <span class="avatar lb-avatar">CC<span class="mini-patch" style="--ring:#F0A830;"></span></span>
+          <span>
+            <div class="lb-handle">ChathamChartCo</div><div class="lb-port">Angoon</div>
+            <div class="lb-patch-row"><span class="lb-patch supporter"><span class="patch-dot" style="background:#F0A830;"></span>Supporter</span><button type="button" class="lb-pw-link" onclick="openPatchWall('ChathamChartCo')">Patch Wall →</button></div>
+          </span>
+        </span>
+        <span class="lb-num">6</span>
+        <span class="lb-num">5 days</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-rank">7</span>
+        <span class="lb-who">
+          <span class="avatar lb-avatar">IS<span class="mini-patch" style="--ring:#B5DBEC;"></span></span>
+          <span>
+            <div class="lb-handle">IcyStraitIvy</div><div class="lb-port">Gustavus</div>
+            <div class="lb-patch-row"><span class="lb-patch"><span class="patch-dot" style="background:#B5DBEC;"></span>Named-Pod Streak</span><button type="button" class="lb-pw-link" onclick="openPatchWall('IcyStraitIvy')">Patch Wall →</button></div>
+          </span>
+        </span>
+        <span class="lb-num">5</span>
+        <span class="lb-num">1 day</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-rank">8</span>
+        <span class="lb-who">
+          <span class="avatar lb-avatar">OH<span class="mini-patch" style="--ring:#7AE8D1;"></span></span>
+          <span>
+            <div class="lb-handle">OldHarborHank</div><div class="lb-port">Craig, Prince of Wales</div>
+            <div class="lb-patch-row"><span class="lb-patch"><span class="patch-dot" style="background:#7AE8D1;"></span>Fluke ID Match</span><button type="button" class="lb-pw-link" onclick="openPatchWall('OldHarborHank')">Patch Wall →</button></div>
+          </span>
+        </span>
+        <span class="lb-num">4</span>
+        <span class="lb-num">—</span>
+      </div>
+      <div class="lb-note">
+        Standings reset monthly · Season totals and streaks live in the Alaska Marine Animal Watch app. Patches and avatar pins show each watcher's pinned patch. Patch walls are opt-in public: open them with the Patch Wall link next to any name. Anonymous sightings still count — the board only shows handles, never names.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ PROFILE ═══════════ -->
+<div class="page info-page" id="page-profile">
+  <div class="info-section">
+    <div class="section-header">
+      <div class="section-label">Your Logbook</div>
+      <h2 class="section-title">TidesWithTara</h2>
+      <p class="section-subtitle">Auke Bay, Juneau · watching these waters since March 2026</p>
+    </div>
+    <div class="profile-stats">
+      <div class="stat-card"><div class="stat-num">42</div><div class="stat-label">Sightings logged</div></div>
+      <div class="stat-card"><div class="stat-num">14</div><div class="stat-label">This month</div></div>
+      <div class="stat-card"><div class="stat-num">9</div><div class="stat-label">Day streak</div></div>
+      <div class="stat-card"><div class="stat-num">4</div><div class="stat-label">Patches</div></div>
+    </div>
+    <div class="info-card">
+      <h3>Patches</h3>
+      <p style="margin-bottom:1rem;">Earned the Field Station way — by adding what you saw to the record.</p>
+      <div class="pin-demo">
+        <span class="avatar avatar-lg">TT<span class="mini-patch" style="--ring:#7AE8D1;"></span></span>
+        <p><strong>Fluke ID Match</strong> is pinned to your avatar — the patch you're known by on the Leaderboard. Swap it for any patch on your wall, any time.</p>
+      </div>
+      <div class="patch-wall">
+        <div class="patch-card">
+          <div class="sewn-patch" style="--ring:#7AE8D1;"><span class="ring"></span><span class="stitch"></span><span class="sewn-glyph"><svg viewBox="-20 -20 40 40" width="32" height="32" fill="none"><path d="M0,-13 C8,-13 14,-6 17,10 C11,3 6,3 0,7 C-6,3 -11,3 -17,10 C-14,-6 -8,-13 0,-13 Z" fill="#7AE8D1" fill-opacity="0.18" stroke="#7AE8D1" stroke-width="2" stroke-linejoin="round"/></svg></span></div>
+          <div class="patch-name">Fluke ID Match</div>
+          <div class="patch-sub">HW-2026-041 · May 12</div>
+          <div class="pin-tag">Pinned</div>
+        </div>
+        <div class="patch-card">
+          <div class="sewn-patch" style="--ring:#E8634A;"><span class="ring"></span><span class="stitch"></span><span class="sewn-glyph"><svg viewBox="-20 -20 40 40" width="32" height="32" fill="none"><path d="M2,-14 C7,-7 9,1 11,10 L-4,9 C-2,2 0,-6 2,-14 Z" fill="#E8634A" fill-opacity="0.18" stroke="#E8634A" stroke-width="2" stroke-linejoin="round"/><path d="M-12,14 Q-6,10.5 0,14 T12,14" stroke="#E8634A" stroke-width="1.5" stroke-linecap="round"/></svg></span></div>
+          <div class="patch-name">First-of-Season Orca</div>
+          <div class="patch-sub">May 3</div>
+        </div>
+        <div class="patch-card">
+          <div class="sewn-patch" style="--ring:#B5DBEC;"><span class="ring"></span><span class="stitch"></span><span class="sewn-glyph"><svg viewBox="-20 -20 40 40" width="32" height="32" fill="none"><circle cx="-8" cy="7" r="2.6" fill="#B5DBEC"/><circle cx="0" cy="-1" r="2.6" fill="#B5DBEC"/><circle cx="8" cy="-9" r="2.6" fill="#B5DBEC"/></svg></span></div>
+          <div class="patch-name">Named-Pod Streak</div>
+          <div class="patch-sub">T-pod · 3 weeks</div>
+        </div>
+        <div class="patch-card">
+          <div class="sewn-patch supporter" style="--ring:#F0A830;"><span class="ring"></span><span class="stitch"></span><span class="sewn-glyph"><svg viewBox="-20 -20 40 40" width="32" height="32" fill="none" stroke="#F0A830" stroke-width="2" stroke-linecap="round"><circle cx="0" cy="-10" r="3.2"/><line x1="0" y1="-6.8" x2="0" y2="11"/><line x1="-5.5" y1="0" x2="5.5" y2="0"/><path d="M-8.5,7.5 C-7,15.5 7,15.5 8.5,7.5"/></svg></span></div>
+          <div class="patch-name">Supporter</div>
+          <div class="patch-sub">2026 beta</div>
+        </div>
+      </div>
+      <p style="font-size:0.78rem; color:var(--text-muted); margin-top:0.9rem; margin-bottom:0;">
+        Supporter patches are always visually distinct — earned patches stay earned.
+      </p>
+      <div class="form-group" style="margin-top:1.2rem;">
+        <label class="form-label">Patch wall visibility</label>
+        <div class="toggle-group">
+          <button type="button" class="toggle-option active" data-group="patch_wall" data-value="public" onclick="setToggle(this)">Public</button>
+          <button type="button" class="toggle-option" data-group="patch_wall" data-value="private" onclick="setToggle(this)">Private</button>
+        </div>
+        <small style="display:block; margin-top:0.4rem; font-size:0.78rem; color:var(--text-muted); font-family:var(--font-display);">
+          Public walls are viewable from the Leaderboard — the Patch Wall link by each name. Private walls show only to you. Your pinned patch is always visible on your avatar.
+        </small>
+      </div>
+      </p>
+    </div>
+    <div class="info-card">
+      <h3>My Sightings</h3>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 0.6rem 0;line-height:1.5;">
+        Your full record — every sighting, the discussion it sparked, and how it appears publicly. Tap any row for the deep view. Your three most recent are shown here; the app lists your whole history.
+      </p>
+      <div id="mySightingsList"></div>
+    </div>
+    <div class="info-card" style="padding:0; overflow:hidden;">
+      <div class="empty-photo">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Humpback_whale_NOAA.jpg?width=1200" alt="Humpback whale surfacing in Southeast Alaska" loading="lazy" onerror="this.remove()">
+        <span class="photo-credit">NOAA Ship Rainier · public domain</span>
+        <div class="empty-line">
+          <div class="empty-line-main">Your photo logbook starts here.</div>
+          <div class="empty-line-sub">Photos you share with a sighting will gather here.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ FEEDBACK ═══════════ -->
+<div class="page form-page" id="page-feedback">
+  <div class="form-container">
+    <div class="section-header" style="margin-bottom:2rem;">
+      <div class="section-label">Help Us Improve</div>
+      <h2 class="section-title">Leave Feedback</h2>
+      <p class="section-subtitle">Alaska Marine Animal Watch is built by the community, for the community. If you have an idea, spotted a bug, or think something could work better — we want to hear it. Every comment helps shape what this tool becomes.</p>
+    </div>
+    <div class="form-card" id="feedbackFormCard">
+      <form id="feedbackForm" onsubmit="submitFeedback(event)">
+        <div class="form-group">
+          <label class="form-label">What kind of feedback is this? *</label>
+          <select class="form-select" name="feedback_type" required>
+            <option value="">Select a category</option>
+            <option>Feature idea</option>
+            <option>Bug report</option>
+            <option>Content suggestion</option>
+            <option>Data or accuracy issue</option>
+            <option>General comment</option>
+            <option>Partnership inquiry</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group" id="otherFeedbackGroup" style="display:none;">
+          <label class="form-label">Please describe</label>
+          <input class="form-input" name="feedback_type_other" placeholder="What kind of feedback is this?">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Your feedback *</label>
+          <textarea class="form-textarea" name="feedback_body" required style="min-height:140px;" placeholder="Tell us what's on your mind — what would make Alaska Marine Animal Watch more useful for you or your community?"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">How do you use the water? <span class="optional">(optional)</span></label>
+          <select class="form-select" name="user_type">
+            <option value="">Select if you'd like</option>
+            <option>Charter captain / guide</option>
+            <option>Recreational boater</option>
+            <option>Kayaker / paddler</option>
+            <option>Researcher / scientist</option>
+            <option>Educator</option>
+            <option>Ferry passenger</option>
+            <option>Cruise passenger</option>
+            <option>Tribal resource manager</option>
+            <option>Government / agency</option>
+            <option>Just curious</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Name <span class="optional">(optional)</span> <span class="private">Private</span></label>
+            <input class="form-input" name="feedback_name" placeholder="Name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email * <span class="private">Private</span></label>
+            <input class="form-input" type="email" name="feedback_email" required placeholder="you@example.com">
+          </div>
+        </div>
+        <div class="form-submit">
+          <button type="submit" class="btn btn-primary">Send Feedback</button>
+        </div>
+      </form>
+    </div>
+    <div class="form-success" id="feedbackSuccess">
+      <div class="form-success-icon"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12.5l2.5 2.5 5-6"/></svg></div>
+      <h3>Feedback Received</h3>
+      <p>Thank you — your input helps make Alaska Marine Animal Watch better for everyone on the water.</p>
+      <button class="btn btn-secondary" onclick="resetFeedbackForm()">Submit Another</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ CONTACT ═══════════ -->
+<div class="page form-page" id="page-contact">
+  <div class="form-container">
+    <div class="section-header" style="margin-bottom:2rem;">
+      <div class="section-label">Contact</div>
+      <h2 class="section-title">Get in Touch</h2>
+      <p class="section-subtitle">Questions, data requests, partnership ideas, or just curiosity about what we're building — we read everything, and we answer as fast as we can.</p>
+    </div>
+    <div class="form-card" id="contactFormCard">
+      <form id="contactForm" onsubmit="submitContact(event)">
+        <div class="form-group">
+          <label class="form-label">What's this about? *</label>
+          <select class="form-select" name="contact_topic" required>
+            <option value="">Select a topic</option>
+            <option>General question</option>
+            <option>Data request</option>
+            <option>Partnership inquiry</option>
+            <option>Press &amp; media</option>
+            <option>Something else</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Your message *</label>
+          <textarea class="form-textarea" name="contact_message" required style="min-height:140px;" placeholder="Tell us what's on your mind — the more detail, the better we can help."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email * <span class="private">Private</span></label>
+          <input class="form-input" type="email" name="contact_email" required placeholder="Where we should send our reply">
+          <small style="display:block; margin-top:0.35rem; font-size:0.78rem; color:var(--text-muted); font-family:var(--font-display);">
+            Only used to reply to you. Never shared, never added to lists.
+          </small>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Your name <span class="optional">(optional)</span></label>
+          <input class="form-input" name="contact_name" placeholder="Only if you'd like us to know who's writing">
+        </div>
+        <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true" tabindex="-1">
+          <label for="wake_confirm_c">Leave this empty</label>
+          <input type="text" id="wake_confirm_c" name="wake_confirm" tabindex="-1" autocomplete="off">
+        </div>
+        <div class="form-submit">
+          <button type="submit" class="btn btn-primary">Send Message</button>
+        </div>
+        <p style="text-align:center; font-size:0.78rem; color:var(--text-muted); font-family:var(--font-display); margin-top:1rem;">
+          Prefer email? Write us directly at <a href="mailto:hello@alaskamarineanimalwatch.com" style="color:var(--teal);">hello@alaskamarineanimalwatch.com</a>
+        </p>
+      </form>
+    </div>
+    <div class="form-success" id="contactSuccess">
+      <div class="form-success-icon"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg></div>
+      <h3>Message Received</h3>
+      <p>Thank you — we'll get back to you as soon as we're back in range.</p>
+      <button class="btn btn-secondary" onclick="resetContactForm()">Send Another</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer class="footer">
+  <div class="footer-inner">
+
+    <div class="footer-logo">Alaska Marine Animal Watch</div>
+    <div class="footer-text">Southeast Alaska Community Wildlife Interactions</div>
+    <div class="footer-text" style="margin-bottom:1.5rem;">
+      Est. 2026
+    </div>
+
+    <div style="border-top:1px solid var(--border-subtle); padding-top:1.5rem; margin-bottom:1.5rem;">
+      <p style="font-family:var(--font-display); font-size:0.9rem; color:var(--text-secondary); max-width:460px; margin:0 auto 1rem; line-height:1.6;">
+  Alaska Marine Animal Watch is free and always will be.</p>
+<p style="font-family:var(--font-display); font-size:0.9rem; color:var(--text-secondary); max-width:460px; margin:0 auto 1rem; line-height:1.6;">
+  If it's been useful to you, or if you just love what lives in these waters, a small contribution helps keep us running.</p>
+      <a href="https://ko-fi.com/akmarineanimalwatch" target="_blank" rel="noopener noreferrer"
+         style="display:inline-flex; align-items:center; gap:0.4rem; font-family:var(--font-display); font-weight:600; font-size:0.85rem; color:var(--teal); text-decoration:none; border:1.5px solid var(--teal); padding:0.5rem 1.5rem; border-radius:var(--radius-sm); transition:var(--transition);"
+         onmouseover="this.style.background='rgba(30,119,175,0.08)'"
+         onmouseout="this.style.background='transparent'">
+        Support Alaska Marine Animal Watch
+      </a>
+      <p style="font-size:0.72rem; color:var(--text-muted); margin-top:0.6rem;">
+        Alaska Marine Animal Watch is an independently operated, for-profit project. Contributions are not tax-deductible.
+      </p>
+    </div>
+
+    <div style="border-top:1px solid var(--border-subtle); padding-top:1.25rem; display:flex; gap:1.5rem; justify-content:center; flex-wrap:wrap;">
+      <button onclick="showPage('feedback')"
+              style="background:none; border:none; cursor:pointer; font-family:var(--font-display); font-size:0.78rem; color:var(--text-muted); letter-spacing:0.04em; transition:var(--transition); padding:0.25rem 0;"
+              onmouseover="this.style.color='var(--teal)'"
+              onmouseout="this.style.color='var(--text-muted)'">
+        Leave Feedback
+      </button>
+      <span style="color:var(--border-subtle); font-size:0.78rem;">·</span>
+      <button onclick="showPage('contact')"
+              style="background:none; border:none; cursor:pointer; font-family:var(--font-display); font-size:0.78rem; color:var(--text-muted); letter-spacing:0.04em; transition:var(--transition); padding:0.25rem 0;"
+              onmouseover="this.style.color='var(--teal)'"
+              onmouseout="this.style.color='var(--text-muted)'">
+        Contact
+      </button>
+      <span style="color:var(--border-subtle); font-size:0.78rem;">·</span>
+      <span style="font-family:var(--font-display); font-size:0.78rem; color:var(--text-muted); letter-spacing:0.04em;">
+        &copy; 2026 Alaska Marine Animal Watch
+      </span>
+    </div>
+
+  </div>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   Alaska Marine Animal Watch — DATA PIPELINE ARCHITECTURE
+   ═══════════════════════════════════════════════════════════════════════════
+
+   FORM SUBMISSIONS (Tally → Google Sheets)
+   ─────────────────────────────────────────
+   Both the Sighting and Violation forms are handled by Tally (tally.so).
+   In production, replace the <form> tags with Tally embed forms or redirect
+   the form action to your Tally endpoint. Tally routes submissions to two
+   separate Google Sheets:
+
+     1. SIGHTINGS sheet — all sighting reports
+     2. VIOLATIONS sheet — all violation reports (NEVER displayed publicly)
+
+   Reporter identity fields (name, email) are stored in Google Sheets but
+   are NEVER exposed to the public map or any public-facing data feed.
+
+   PUBLIC MAP DATA (Google Sheets → JSON → Map)
+   ─────────────────────────────────────────────
+   The sighting map reads from a SEPARATE published Google Sheets tab that
+   contains ONLY public-safe fields:
+     • Species, Count, Behavior, Location name, Latitude, Longitude, Date
+
+   This public tab is published as a web page (File → Share → Publish to web)
+   and consumed as a JSON feed via the Google Sheets API v4 or the legacy
+   "published CSV" URL pattern.
+
+   The violation sheet and all reporter PII remain in private tabs that are
+   never published and never fetched by the front end.
+
+   TO ACTIVATE PRODUCTION MODE:
+     1. Set PRODUCTION_MODE = true
+     2. Paste your published Google Sheet URL into SHEETS_FEED_URL
+     3. Ensure the public tab columns match: Species | Count | Behavior |
+        Location | Latitude | Longitude | Date | Time
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+// ─── CONFIGURATION ───
+const PRODUCTION_MODE = false; // flip to true when Sheets feed is live
+const SHEETS_FEED_URL = '';    // paste published Google Sheets CSV URL here
+// Example: 'https://docs.google.com/spreadsheets/d/e/YOUR_SHEET_ID/pub?gid=0&single=true&output=csv'
+
+// ─── SPECIES COLORS (shared by sample & live data) ───
+// Species ID colors — data layer, cross-referenced from the brand palette:
+// Seafoam = humpback pins · Coral = orca pins · Whale Gray = sea lion pins ·
+// Ice Blue = seal pins. Porpoise (Slate Blue), Sea Otter (Amber), Other (muted slate)
+// are provisional — not fixed in the palette notes.
+const SPECIES_COLORS = {
+  'Humpback Whale': '#7AE8D1',
+  'Orca / Killer Whale': '#E8634A',
+  'Steller Sea Lion': '#4A5568',
+  'Harbor Seal': '#B5DBEC',
+  'Dall\'s Porpoise': '#547492',
+  'Harbor Porpoise': '#547492',
+  'Sea Otter': '#F0A830',
+  'Other': '#94A8C4'
+};
+
+// ─── SAMPLE DATA (used when PRODUCTION_MODE is false) ───
+// These are hardcoded prototype markers — real locations across SE Alaska.
+// PUBLIC FIELDS ONLY: no reporter names, emails, or violation data.
+// Sample dates use relative offsets from today for demo purposes
+const _today = new Date();
+const _d = (daysAgo, h=9, m=0) => {
+  const d = new Date(_today); d.setDate(d.getDate() - daysAgo); d.setHours(h,m,0,0);
+  return { date: d.toISOString().split('T')[0], time: `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}` };
+};
+
+const SAMPLE_SIGHTINGS = [
+  { species:'Humpback Whale', count:4, behavior:'Feeding', location:'Point Retreat, Lynn Canal', lat:58.4112, lng:-134.9561, ..._d(0,9,15), vessel_count:6 },
+  { species:'Humpback Whale', count:2, behavior:'Breaching', location:'Frederick Sound, near Five Finger Lighthouse', lat:57.2683, lng:-133.6312, ..._d(0,14,30), vessel_count:1 },
+  { species:'Orca / Killer Whale', count:6, behavior:'Traveling', location:'Chatham Strait, south of Angoon', lat:57.3914, lng:-134.5717, ..._d(1,11,0), vessel_count:10 },
+  { species:'Steller Sea Lion', count:15, behavior:'Resting', location:'Benjamin Island, near Juneau', lat:58.5322, lng:-134.8911, ..._d(2,16,45), vessel_count:0 },
+  { species:'Sea Otter', count:8, behavior:'Feeding', location:'Sitka Sound, near Magic Island', lat:57.0470, lng:-135.3539, ..._d(3,10,20), vessel_count:3 },
+  { species:'Dall\'s Porpoise', count:12, behavior:'Traveling', location:'Stephens Passage, north of Taku Inlet', lat:58.2145, lng:-134.0833, ..._d(5,8,30), vessel_count:1 },
+  { species:'Harbor Seal', count:3, behavior:'Resting', location:'Mendenhall Bar, Juneau', lat:58.3551, lng:-134.5472, ..._d(7,13,0), vessel_count:0 },
+  { species:'Humpback Whale', count:1, behavior:'With calf', location:'Seymour Canal, Admiralty Island', lat:57.9125, lng:-134.1033, ..._d(10,7,45), vessel_count:0 },
+  { species:'Harbor Porpoise', count:5, behavior:'Feeding', location:'Wrangell Narrows, near Petersburg', lat:56.7819, lng:-132.9553, ..._d(14,12,10), vessel_count:3 },
+  { species:'Orca / Killer Whale', count:3, behavior:'Feeding', location:'Icy Strait, near Gustavus', lat:58.2100, lng:-135.7350, ..._d(21,15,50), vessel_count:1 },
+  { species:'Sea Otter', count:20, behavior:'Resting', location:'Ketchikan waterfront, Tongass Narrows', lat:55.3422, lng:-131.6369, ..._d(28,9,0), vessel_count:6 },
+  { species:'Steller Sea Lion', count:30, behavior:'Resting', location:'Gran Point, Brothers Islands', lat:57.4500, lng:-133.8200, ..._d(35,11,30), vessel_count:0 }
+];
+
+// ─── ACTIVE SIGHTING DATA (populated by loadSightings) ───
+let liveSightings = [];
+
+// ─── SAMPLE FIELD NOTES + DISCUSSION THREADS (prototype demo, shared by map popups + logbook) ───
+const sampleFieldNotes = {
+  0: { author: 'TidesWithTara', text: 'Bubble-net feeding right off the point — glassy water, you could hear them breathe. The gulls gave it away first.', time: '07:40' },
+  4: { author: 'KayakGuideMia', text: 'Rafted up in the kelp line all morning. Two moms with pups — gave them a wide berth.', time: '09:15' }
+};
+const sampleThreads = {
+  0: [
+    { author: 'Captain Dave', text: 'Saw this group again the next morning — still feeding in the same spot.', time: '2h ago', replies: [] },
+    { author: 'Marine Bio Student', text: 'Likely T-pod based on dorsal fin markings. Heading toward Chatham.', time: '1d ago', replies: [
+      { author: 'Captain Dave', text: 'That matches what I saw — six animals heading southeast.', time: '22h ago' }
+    ] }
+  ],
+  2: [
+    { author: 'Marine Bio Student', text: 'Dorsal fin comparison with last month\'s catalog shot looks like a strong match.', time: '1d ago', replies: [] }
+  ],
+  4: [
+    { author: 'OldHarborHank', text: 'Pups were vocal on the hydrophone around noon. Classic raft behavior.', time: '3h ago', replies: [] }
+  ]
+};
+
+// ─── GOOGLE SHEETS CSV PARSER ───
+// Parses the published CSV from Google Sheets into sighting objects.
+// Expects columns: Species, Count, Behavior, Location, Latitude, Longitude, Date, Time
+// Strips any rows with missing lat/lng. NEVER parses reporter identity fields.
+function parseSheetCSV(csvText) {
+  const lines = csvText.trim().split('\n');
+  if (lines.length < 2) return [];
+  // Parse header row to find column indices (flexible column order)
+  const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, '').toLowerCase());
+  const col = (name) => headers.indexOf(name);
+  const iSpecies = col('species'), iCount = col('count'), iBehavior = col('behavior');
+  const iLocation = col('location'), iLat = col('latitude'), iLng = col('longitude');
+  const iDate = col('date'), iTime = col('time');
+  // Validate required columns exist
+  if ([iSpecies, iLat, iLng].some(i => i === -1)) {
+    console.warn('Alaska Marine Animal Watch: Google Sheet missing required columns (Species, Latitude, Longitude).');
+    return [];
+  }
+  const sightings = [];
+  for (let i = 1; i < lines.length; i++) {
+    // Simple CSV parse (handles quoted commas in location names)
+    const cells = [];
+    let current = '', inQuotes = false;
+    for (const ch of lines[i]) {
+      if (ch === '"') { inQuotes = !inQuotes; }
+      else if (ch === ',' && !inQuotes) { cells.push(current.trim()); current = ''; }
+      else { current += ch; }
+    }
+    cells.push(current.trim());
+    const lat = parseFloat(cells[iLat]);
+    const lng = parseFloat(cells[iLng]);
+    if (isNaN(lat) || isNaN(lng)) continue; // skip rows without valid coords
+    sightings.push({
+      species:  cells[iSpecies] || 'Unknown',
+      count:    parseInt(cells[iCount]) || 1,
+      behavior: iBehavior !== -1 ? (cells[iBehavior] || 'Unknown') : 'Unknown',
+      location: iLocation !== -1 ? (cells[iLocation] || '') : '',
+      lat, lng,
+      date: iDate !== -1 ? (cells[iDate] || '') : '',
+      time: iTime !== -1 ? (cells[iTime] || '') : ''
+    });
+  }
+  return sightings;
+}
+
+// ─── DATA LOADER ───
+// In production: fetches the published Google Sheets CSV, parses it, and
+// populates the map. Falls back to SAMPLE_SIGHTINGS on any error.
+// In prototype mode: uses SAMPLE_SIGHTINGS directly.
+async function loadSightings() {
+  if (PRODUCTION_MODE && SHEETS_FEED_URL) {
+    try {
+      updateDataStatus('loading');
+      const resp = await fetch(SHEETS_FEED_URL);
+      if (!resp.ok) throw new Error(`Sheet fetch failed: ${resp.status}`);
+      const csv = await resp.text();
+      liveSightings = parseSheetCSV(csv);
+      if (liveSightings.length === 0) throw new Error('No valid sighting rows parsed');
+      updateDataStatus('live', liveSightings.length);
+      console.log(`Alaska Marine Animal Watch: Loaded ${liveSightings.length} sightings from Google Sheets.`);
+    } catch (err) {
+      console.warn('Alaska Marine Animal Watch: Could not load live data, falling back to sample.', err);
+      liveSightings = [...SAMPLE_SIGHTINGS];
+      updateDataStatus('sample');
+    }
+  } else {
+    liveSightings = [...SAMPLE_SIGHTINGS];
+    updateDataStatus('sample');
+  }
+}
+
+// ─── DATA SOURCE INDICATOR ───
+function updateDataStatus(status, count) {
+  const el = document.getElementById('dataSourceBadge');
+  if (!el) return;
+  if (status === 'live') {
+    el.textContent = `● Live — ${count} sightings`;
+    el.className = 'data-badge data-badge-live';
+  } else if (status === 'loading') {
+    el.textContent = '◌ Loading live data…';
+    el.className = 'data-badge data-badge-loading';
+  } else {
+    el.textContent = '○ Sample data (prototype)';
+    el.className = 'data-badge data-badge-sample';
+  }
+}
+
+// ─── PAGE NAVIGATION ───
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const links = document.querySelectorAll('.nav-link');
+  const map = { home:0, sighting:2, violation:3, map:4, gallery:5, leaderboard:6, profile:7, why:8, about:9, feedback:11 };
+  if (map[id] !== undefined && links[map[id]]) links[map[id]].classList.add('active');
+  if ((id === 'sighting' || id === 'violation') && links[1]) links[1].classList.add('active');
+  document.querySelectorAll('.nav-item.open').forEach(n => n.classList.remove('open'));
+  window.scrollTo(0, 0);
+  document.getElementById('navLinks').classList.remove('open');
+  if (id === 'map' && !window._mapInitialized) initMap();
+}
+
+// Reporting dropdown — click to open, click a link or outside to close.
+// On mobile the two links sit always-visible inside the open menu.
+function toggleReporting(e) {
+  e.stopPropagation();
+  const item = e.currentTarget.closest('.nav-item');
+  const open = item.classList.toggle('open');
+  e.currentTarget.setAttribute('aria-expanded', open);
+}
+document.addEventListener('click', (e) => {
+  const openItem = document.querySelector('.nav-item.open');
+  if (openItem && !e.target.closest('.nav-item')) {
+    openItem.classList.remove('open');
+    openItem.querySelector('.nav-parent').setAttribute('aria-expanded', 'false');
+  }
+});
+
+function toggleMobileMenu() {
+  document.getElementById('navLinks').classList.toggle('open');
+}
+
+// ─── THEME ───
+// The page always opens in light (Field Station) — set on the <html> tag itself,
+// so light applies even before JS runs. The toggle switches themes for the session.
+const MAP_TILES = {
+  light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+  dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+};
+const SAT_TILE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+const SAT_ATTR = 'Tiles &copy; Esri — Source: Esri, Maxar, Earthstar Geographics';
+const CARTO_ATTR = '&copy; <a href="https://www.openstreetmap.org/">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>';
+
+const ICON_SUN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
+const ICON_MOON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+
+function setTheme(next) {
+  document.documentElement.setAttribute('data-theme', next);
+  const btn = document.getElementById('themeBtn');
+  if (btn) {
+    // Icon shows the mode you'd switch TO: sun while dark, moon while light.
+    btn.innerHTML = next === 'dark' ? ICON_SUN : ICON_MOON;
+    btn.setAttribute('aria-label', next === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  }
+  if (window._map) {
+    if (window._tileLayer) window._tileLayer.remove();
+    // Respect the basemap choice: satellite stays satellite across theme switches.
+    window._tileLayer = window._baseMap === 'satellite'
+      ? L.tileLayer(SAT_TILE, { attribution: SAT_ATTR, maxZoom: 18 }).addTo(window._map)
+      : L.tileLayer(MAP_TILES[next], { attribution: CARTO_ATTR, maxZoom: 18 }).addTo(window._map);
+  }
+}
+
+function toggleTheme() {
+  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+}
+
+// ─── TOGGLE BUTTONS ───
+function setToggle(btn) {
+  const group = btn.parentElement;
+  group.querySelectorAll('.toggle-option').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ─── FORM SUBMISSIONS ───
+// ─── CONFIGURATION: paste your Apps Script Web App URLs here ───
+const SIGHTINGS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwhJHjs356T0WJdjISgXNG9rhmgBOv2ujPF5Khyyy6EXpUj8MFPNbu3buSCYrQTrLe_Lg/exec';
+const VIOLATIONS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGC36iLyDPlzvrLQ-AxKEKH4t_D23WWd1WDmemdImAT0p6ve5Z3FrQPTURt8Tal93LQw/exec';
+const FEEDBACK_SCRIPT_URL = ''; // deploy a third Apps Script for feedback, paste URL here
+const CONTACT_SCRIPT_URL = ''; // deploy a fourth Apps Script for contact, paste URL here
+
+// ─── FORM SUBMISSIONS ───
+// Each form POSTs JSON to a Google Apps Script Web App, which appends
+// the row to the appropriate Google Sheet. Uses mode:'no-cors' because
+// Apps Script redirects on POST — the submission still lands.
+// Reporter name/email are sent to the sheet but NEVER displayed on the
+// public map. Violation reports go to a fully separate private sheet.
+
+function getToggleValue(form, groupName) {
+  const btn = form.querySelector(`[data-group="${groupName}"].active`);
+  return btn ? btn.dataset.value : '';
+}
+
+async function submitSighting(e) {
+  e.preventDefault();
+  if (document.getElementById('wake_confirm_s').value !== '') return;
+  const form = document.getElementById('sightingForm');
+  const btn = form.querySelector('button[type="submit"]');
+  btn.textContent = 'Submitting…'; btn.disabled = true;
+  const data = {
+    species: form.species.value,
+    species_other: form.species_other ? form.species_other.value : '',
+    count: form.count.value,
+    behavior: form.behavior.value,
+    location: form.location.value,
+    latitude: form.latitude.value,
+    longitude: form.longitude.value,
+    date: form.date.value,
+    time: form.time.value,
+    vessel_count: parseInt(form.vessel_count.value) || 0,
+    followup_ok: getToggleValue(form, 'followup_ok'),
+    photo_consent: getToggleValue(form, 'photo_consent'),
+    notes_public: getToggleValue(form, 'notes_public'),
+    reporter_name: form.reporter_name.value,
+    reporter_email: form.reporter_email.value,
+    notes: form.notes.value,
+    submitted_at: new Date().toISOString()
+  };
+  if (SIGHTINGS_SCRIPT_URL) {
+    try {
+      await fetch(SIGHTINGS_SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+    } catch(err) { console.warn('Alaska Marine Animal Watch: Sighting submission error', err); }
+  }
+  window._lastSighting = { species: data.species, location: data.location };
+  document.getElementById('sightingFormCard').style.display = 'none';
+  document.getElementById('sightingSuccess').classList.add('show');
+}
+
+function shareSighting() {
+  const s = window._lastSighting || {};
+  const species = s.species || 'marine wildlife';
+  const location = s.location || 'Southeast Alaska';
+  const text = `I just spotted ${species} near ${location} and logged it on Alaska Marine Animal Watch — a community wildlife map for Southeast Alaska.`;
+  const url = 'https://alaskamarineanimalwatch.com';
+  if (navigator.share) {
+    navigator.share({ title: 'I spotted it on Alaska Marine Animal Watch!', text, url }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(text + ' ' + url).then(() => {
+      const btn = document.querySelector('#sightingSuccess .btn-primary');
+      if (btn) { const orig = btn.innerHTML; btn.textContent = 'Copied to clipboard!'; setTimeout(() => btn.innerHTML = orig, 2000); }
+    }).catch(() => { window.open(url, '_blank'); });
+  }
+}
+
+function resetSightingForm() {
+  document.getElementById('sightingForm').reset();
+  document.getElementById('sightingFormCard').style.display = 'block';
+  document.getElementById('sightingSuccess').classList.remove('show');
+  document.getElementById('otherSpeciesGroup').style.display = 'none';
+  const btn = document.querySelector('#sightingForm button[type="submit"]');
+  btn.textContent = 'Submit Sighting Report'; btn.disabled = false;
+}
+
+async function submitViolation(e) {
+  e.preventDefault();
+  if (document.getElementById('wake_confirm_v').value !== '') return;
+  const form = document.getElementById('violationForm');
+  const btn = form.querySelector('button[type="submit"]');
+  btn.textContent = 'Submitting…'; btn.disabled = true;
+  const data = {
+    violation_type: form.violation_type.value,
+    violation_type_other: form.violation_type_other ? form.violation_type_other.value : '',
+    species: form.species.value,
+    vessel_description: form.vessel_description.value,
+    location: form.location.value,
+    latitude: form.latitude.value,
+    longitude: form.longitude.value,
+    date: form.date.value,
+    time: form.time.value,
+    reported_noaa: getToggleValue(form, 'reported_noaa'),
+    statement_type: getToggleValue(form, 'statement_type'),
+    noaa_batch_consent: form.noaa_batch_consent ? form.noaa_batch_consent.checked ? 'Yes' : 'No' : 'No',
+    ok_to_contact: getToggleValue(form, 'ok_to_contact'),
+    reporter_name: form.reporter_name.value,
+    reporter_email: form.reporter_email.value,
+    notes: form.notes.value,
+    submitted_at: new Date().toISOString()
+  };
+  if (VIOLATIONS_SCRIPT_URL) {
+    try {
+      await fetch(VIOLATIONS_SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+    } catch(err) { console.warn('Alaska Marine Animal Watch: Violation submission error', err); }
+  }
+  document.getElementById('violationFormCard').style.display = 'none';
+  document.getElementById('violationSuccess').classList.add('show');
+}
+
+function resetViolationForm() {
+  document.getElementById('violationForm').reset();
+  document.getElementById('violationFormCard').style.display = 'block';
+  document.getElementById('violationSuccess').classList.remove('show');
+  document.getElementById('otherViolationGroup').style.display = 'none';
+  const btn = document.querySelector('#violationForm button[type="submit"]');
+  btn.textContent = 'Submit Violation Report'; btn.disabled = false;
+}
+
+async function submitFeedback(e) {
+  e.preventDefault();
+  const form = document.getElementById('feedbackForm');
+  const btn = form.querySelector('button[type="submit"]');
+  btn.textContent = 'Sending…'; btn.disabled = true;
+  const data = {
+    feedback_type: form.feedback_type.value,
+    feedback_type_other: form.feedback_type_other ? form.feedback_type_other.value : '',
+    feedback_body: form.feedback_body.value,
+    user_type: form.user_type.value,
+    feedback_name: form.feedback_name.value,
+    feedback_email: form.feedback_email.value,
+    submitted_at: new Date().toISOString()
+  };
+  if (FEEDBACK_SCRIPT_URL) {
+    try {
+      await fetch(FEEDBACK_SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+    } catch(err) { console.warn('Alaska Marine Animal Watch: Feedback submission error', err); }
+  }
+  document.getElementById('feedbackFormCard').style.display = 'none';
+  document.getElementById('feedbackSuccess').classList.add('show');
+}
+
+function resetFeedbackForm() {
+  document.getElementById('feedbackForm').reset();
+  document.getElementById('feedbackFormCard').style.display = 'block';
+  document.getElementById('feedbackSuccess').classList.remove('show');
+  document.getElementById('otherFeedbackGroup').style.display = 'none';
+  const btn = document.querySelector('#feedbackForm button[type="submit"]');
+  btn.textContent = 'Send Feedback'; btn.disabled = false;
+}
+
+// ─── CONTACT ───
+async function submitContact(e) {
+  e.preventDefault();
+  const form = document.getElementById('contactForm');
+  const btn = form.querySelector('button[type="submit"]');
+  btn.textContent = 'Sending…'; btn.disabled = true;
+  const data = {
+    topic: form.contact_topic.value,
+    message: form.contact_message.value,
+    email: form.contact_email.value,
+    name: form.contact_name.value,
+    wake_confirm: form.wake_confirm.value,
+    submitted_at: new Date().toISOString()
+  };
+  if (CONTACT_SCRIPT_URL) {
+    try {
+      await fetch(CONTACT_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    } catch (err) { console.warn('AMAW: contact submission error', err); }
+  }
+  document.getElementById('contactFormCard').style.display = 'none';
+  document.getElementById('contactSuccess').classList.add('show');
+}
+
+function resetContactForm() {
+  const form = document.getElementById('contactForm');
+  form.reset();
+  const btn = form.querySelector('button[type="submit"]');
+  btn.textContent = 'Send Message'; btn.disabled = false;
+  document.getElementById('contactFormCard').style.display = 'block';
+  document.getElementById('contactSuccess').classList.remove('show');
+}
+
+// ─── PHOTO CONSENT NOTES ───
+const PHOTO_NOTE_COPY = {
+  sighting: {
+    credit: 'Credit features it in the gallery under your handle.',
+    anonymous: 'Shown in the gallery as "an anonymous Alaska Marine Animal Watch watcher."',
+    private: 'Keeps this photo private to your logbook — we never feature it.'
+  },
+  gallery: {
+    credit: '"With credit" features it in the gallery under your handle.',
+    anonymous: 'Features it as "an anonymous Alaska Marine Animal Watch watcher."',
+    private: 'Keeps it in your private logbook — we never feature it.'
+  }
+};
+function updatePhotoNote(btn, noteId) {
+  const note = document.getElementById(noteId);
+  if (!note) return;
+  const set = noteId === 'photoNoteGallery' ? PHOTO_NOTE_COPY.gallery : PHOTO_NOTE_COPY.sighting;
+  const line = set[btn.dataset.value] || set.private;
+  note.textContent = line + ' You can change your mind on any photo, any time.';
+}
+
+// ─── MAP ───
+let activeFilters = new Set(Object.keys(SPECIES_COLORS));
+let activeDateRange = 'all'; // 'all', '7', '30'
+let activeVessel = 'any';    // 'any', 'crowded', 'moderate', 'quiet'
+
+// ─── VESSEL DENSITY ───
+const VESSEL_DENSITY = {
+  colors: { 0: 'transparent', 1: '#00c9b1', 3: '#f0a830', 6: '#e8634a', 10: '#FF2859' },
+  getLevel(vc) {
+    const v = parseInt(vc) || 0;
+    if (v >= 10) return { ring: '#FF2859', ringWidth: 6, label: '10+ boats — very crowded', level: 'crowded' };
+    if (v >= 6)  return { ring: '#e8634a', ringWidth: 5, label: '6–10 boats — crowded', level: 'crowded' };
+    if (v >= 3)  return { ring: '#f0a830', ringWidth: 4, label: '3–5 boats — moderate', level: 'moderate' };
+    if (v >= 1)  return { ring: '#00c9b1', ringWidth: 2, label: '1–2 boats — quiet', level: 'quiet' };
+    return { ring: 'transparent', ringWidth: 0, label: 'No boats reported', level: 'quiet' };
+  }
+};
+
+function matchesVessel(sighting) {
+  if (activeVessel === 'any') return true;
+  const vc = parseInt(sighting.vessel_count) || 0;
+  if (activeVessel === 'crowded') return vc >= 6;
+  if (activeVessel === 'moderate') return vc >= 3 && vc < 6;
+  if (activeVessel === 'quiet') return vc < 3;
+  return true;
+}
+const AREA_KEYWORDS = {
+  juneau:    ['juneau','douglas','auke','mendenhall','gastineau','lynn canal','stephens passage'],
+  sitka:     ['sitka','sitka sound','baranof'],
+  ketchikan: ['ketchikan','tongass','revillagigedo'],
+  petersburg:['petersburg','wrangell narrows','frederick sound'],
+  wrangell:  ['wrangell'],
+  gustavus:  ['gustavus','glacier bay','icy strait'],
+  haines:    ['haines','chilkat'],
+  skagway:   ['skagway','taiya'],
+  angoon:    ['angoon','chatham strait','admiralty'],
+  craig:     ['craig','prince of wales','klawock'],
+  yakutat:   ['yakutat']
+};
+
+function matchesArea(location, areaKey) {
+  if (!areaKey) return true; // "All Areas"
+  const loc = location.toLowerCase();
+  if (areaKey === 'other') {
+    // "Other" = doesn't match any known area
+    return !Object.values(AREA_KEYWORDS).some(keywords =>
+      keywords.some(kw => loc.includes(kw))
+    );
+  }
+  const keywords = AREA_KEYWORDS[areaKey];
+  return keywords ? keywords.some(kw => loc.includes(kw)) : true;
+}
+
+function getFilteredSightings() {
+  const areaKey = document.getElementById('areaFilter')?.value || '';
+  return liveSightings.filter(s =>
+    activeFilters.has(s.species) &&
+    matchesArea(s.location, areaKey) &&
+    matchesDateRange(s.date) &&
+    matchesVessel(s)
+  );
+}
+
+async function initMap() {
+  window._mapInitialized = true;
+  await loadSightings();
+
+  const map = L.map('sighting-map', {
+    center: [57.5, -134.0],
+    zoom: 7,
+    zoomControl: true
+  });
+  window._map = map;
+  // Default basemap = satellite (per Jojo, 2026-10-28). Chart remains a toggle.
+  window._baseMap = 'satellite';
+  window._tileLayer = L.tileLayer(SAT_TILE, {
+    attribution: SAT_ATTR,
+    maxZoom: 18
+  }).addTo(map);
+
+  window._clusterGroup = L.markerClusterGroup({
+    maxClusterRadius: 60,
+    spiderfyOnMaxZoom: true,
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: true,
+    disableClusteringAtZoom: 14
+  });
+  map.addLayer(window._clusterGroup);
+
+  window._markers = [];
+  buildFilters();
+  addMarkers();
+  updateStats();
+
+  setTimeout(() => map.invalidateSize(), 200);
+}
+
+function addMarkers() {
+  if (window._clusterGroup) window._clusterGroup.clearLayers();
+  window._markers = [];
+  const now = new Date();
+
+  const filtered = getFilteredSightings();
+  filtered.forEach((s, idx) => {
+    const color = SPECIES_COLORS[s.species] || '#94A8C4';
+
+    // Time-relevance: fade markers by age
+    let daysAgo = Infinity;
+    if (s.date) {
+      const sd = new Date(s.date + (s.time ? 'T' + s.time : ''));
+      daysAgo = (now - sd) / (1000 * 60 * 60 * 24);
+    }
+    let freshness, freshLabel;
+    if (daysAgo < 1)       { freshness = 1.0;  freshLabel = 'Today'; }
+    else if (daysAgo < 3)  { freshness = 0.85; freshLabel = 'Recent'; }
+    else if (daysAgo < 7)  { freshness = 0.65; freshLabel = 'This week'; }
+    else if (daysAgo < 14) { freshness = 0.45; freshLabel = '~2 weeks ago'; }
+    else if (daysAgo < 30) { freshness = 0.3;  freshLabel = 'This month'; }
+    else                   { freshness = 0.18; freshLabel = 'Older'; }
+
+    // Species dot marker (colored dot ID, no emoji) with vessel density ring
+    const dotSize = Math.min(16 + s.count * 1.5, 30);
+    const vd = VESSEL_DENSITY.getLevel(s.vessel_count);
+    const ringBorder = vd.ringWidth > 0
+      ? `border:${vd.ringWidth}px solid ${vd.ring};`
+      : `border:2px solid transparent;`;
+    const outerSize = dotSize + (vd.ringWidth > 0 ? vd.ringWidth * 2 + 8 : 8);
+    const dotIcon = L.divIcon({
+      html: `<div style="width:${outerSize}px;height:${outerSize}px;border-radius:50%;${ringBorder}display:flex;align-items:center;justify-content:center;opacity:${freshness};cursor:pointer;"><span style="width:${dotSize}px;height:${dotSize}px;border-radius:50%;background:${color};border:2px solid rgba(255,255,255,0.9);box-shadow:0 1px 4px rgba(0,0,0,0.4);"></span></div>`,
+      className: 'species-dot-marker',
+      iconSize: [outerSize, outerSize],
+      iconAnchor: [outerSize/2, outerSize/2],
+      popupAnchor: [0, -outerSize/2]
+    });
+    const marker = L.marker([s.lat, s.lng], { icon: dotIcon });
+
+    // Build field note + discussion thread
+    const globalIdx = liveSightings.indexOf(s);
+    const fn = sampleFieldNotes[globalIdx];
+    const fieldNoteHTML = fn
+      ? `<div style="background:var(--surface-raised);padding:0.5rem 0.6rem;border-radius:6px;margin-bottom:0.4rem;"><strong style="font-size:0.75rem;color:var(--teal);">${fn.author}</strong><span style="font-size:0.65rem;color:var(--text-muted);margin-left:0.4rem;">${fn.time}</span><div style="font-size:0.78rem;color:var(--text-secondary);margin-top:0.2rem;">${fn.text}</div></div>`
+      : '<div style="font-size:0.78rem;color:var(--text-muted);font-style:italic;margin-bottom:0.4rem;">No shared field note on this sighting.</div>';
+    const thread = sampleThreads[globalIdx] || [];
+    const replyCount = thread.reduce((n, t) => n + 1 + t.replies.length, 0);
+    const threadHTML = thread.length
+      ? thread.map(t => `<div style="background:var(--surface-raised);padding:0.5rem 0.6rem;border-radius:6px;margin-bottom:0.4rem;"><strong style="font-size:0.75rem;color:var(--teal);">${t.author}</strong><span style="font-size:0.65rem;color:var(--text-muted);margin-left:0.4rem;">${t.time}</span><div style="font-size:0.78rem;color:var(--text-secondary);margin-top:0.2rem;">${t.text}</div>${t.replies.map(r => `<div style="border-left:2px solid var(--border-subtle);margin:0.4rem 0 0 0.5rem;padding:0.3rem 0 0.3rem 0.6rem;"><strong style="font-size:0.72rem;color:var(--teal);">${r.author}</strong><span style="font-size:0.62rem;color:var(--text-muted);margin-left:0.4rem;">${r.time}</span><div style="font-size:0.75rem;color:var(--text-secondary);margin-top:0.15rem;">${r.text}</div></div>`).join('')}</div>`).join('')
+      : '<div style="font-size:0.78rem;color:var(--text-muted);font-style:italic;">No replies yet — start the conversation.</div>';
+
+    marker.bindPopup(`
+      <div class="popup-title">${s.species}</div>
+      <div class="popup-detail"><strong>Count:</strong> ${s.count}</div>
+      <div class="popup-detail"><strong>Behavior:</strong> ${s.behavior}</div>
+      <div class="popup-detail"><strong>Location:</strong> ${s.location}</div>
+      <div class="popup-detail"><strong>Date:</strong> ${s.date}${s.time ? ' at ' + s.time : ''}</div>
+      <div class="popup-detail" style="margin-top:0.25rem;"><strong>Freshness:</strong> ${freshLabel}</div>
+      <div class="popup-detail"><strong>Vessels nearby:</strong> ${vd.label}</div>
+      <div style="margin-top:0.6rem;border-top:1px solid var(--border-subtle);padding-top:0.5rem;">
+        <div style="font-family:var(--font-display);font-size:0.75rem;font-weight:700;margin-bottom:0.4rem;">Field note <span style="font-weight:400;color:var(--text-muted);">· shared by the reporter</span></div>
+        ${fieldNoteHTML}
+        <div style="font-family:var(--font-display);font-size:0.75rem;font-weight:700;margin:0.5rem 0 0.4rem;">Discussion <span style="font-weight:400;color:var(--text-muted);">· ${replyCount} ${replyCount === 1 ? 'reply' : 'replies'}</span></div>
+        ${threadHTML}
+        <div style="margin-top:0.5rem;">
+          <input type="text" placeholder="Add to the discussion…" style="width:100%;padding:0.35rem 0.5rem;font-size:0.78rem;border:1px solid var(--border-subtle);border-radius:4px;background:var(--navy-deep);color:var(--text-primary);font-family:var(--font-body);" onkeydown="if(event.key==='Enter'){addComment(this,${globalIdx})}">
+        </div>
+        <div style="margin-top:0.4rem;font-size:0.68rem;color:var(--text-muted);">
+          Something wrong here? <a href="#" onclick="openReport(${globalIdx});return false;" style="color:var(--teal);text-decoration:none;font-weight:600;">Report it</a> — a moderator will look.
+        </div>
+      </div>
+    `, { maxWidth: 300, minWidth: 220 });
+    window._markers.push(marker);
+  });
+  if (window._clusterGroup) window._clusterGroup.addLayers(window._markers);
+}
+
+function buildFilters() {
+  // Species checkboxes
+  const speciesContainer = document.getElementById('speciesFilters');
+  speciesContainer.innerHTML = '';
+  const allSpecies = new Set([...Object.keys(SPECIES_COLORS), ...liveSightings.map(s => s.species)]);
+  allSpecies.forEach(species => {
+    const dotColor = SPECIES_COLORS[species] || '#94A8C4';
+    if (!activeFilters.has(species) && !SPECIES_COLORS[species]) {
+      activeFilters.add(species);
+    }
+    const label = document.createElement('label');
+    label.className = 'filter-check';
+    label.innerHTML = `
+      <input type="checkbox" ${activeFilters.has(species) ? 'checked' : ''} onchange="toggleSpecies('${species.replace(/'/g, "\\'")}', this.checked)">
+      <span style="width:9px;height:9px;border-radius:50%;background:${dotColor};flex-shrink:0;"></span>
+      ${species}
+    `;
+    speciesContainer.appendChild(label);
+  });
+
+  // Note: behavior is not a sidebar filter — it lives on each sighting
+  // (map popup + gallery captions) per Jojo's 2026-10-28 call. Species,
+  // area, time, and vessel density remain the map's filter set.
+}
+
+function toggleSpecies(species, checked) {
+  if (checked) activeFilters.add(species);
+  else activeFilters.delete(species);
+  applyFilters();
+}
+
+// ─── TIME SLIDER ───
+const TIME_SLIDER_OPTS = [
+  { label: 'Last 6 Hours', days: 0.25 },
+  { label: 'Last 24 Hours', days: 1 },
+  { label: 'Last 3 Days', days: 3 },
+  { label: 'Last 7 Days', days: 7 },
+  { label: 'Last 30 Days', days: 30 },
+  { label: 'All Time', days: Infinity }
+];
+
+function setTimeSlider(val) {
+  const opt = TIME_SLIDER_OPTS[parseInt(val)];
+  activeDateRange = opt.days === Infinity ? 'all' : String(opt.days);
+  document.getElementById('timeSliderLabel').textContent = opt.label;
+  applyFilters();
+}
+
+function matchesDateRange(dateStr) {
+  if (activeDateRange === 'all') return true;
+  if (!dateStr) return false;
+  const sightingDate = new Date(dateStr);
+  const now = new Date();
+  const days = parseFloat(activeDateRange);
+  const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+  return sightingDate >= cutoff;
+}
+
+// ─── COMMENT THREADS (prototype) ───
+function addComment(input, sightingIdx) {
+  const text = input.value.trim();
+  if (!text) return;
+  // In prototype, show the comment locally in the popup
+  const commentDiv = document.createElement('div');
+  commentDiv.style.cssText = 'background:var(--surface-raised);padding:0.5rem 0.6rem;border-radius:6px;margin-bottom:0.4rem;';
+  commentDiv.innerHTML = `<strong style="font-size:0.75rem;color:var(--teal);">You</strong><span style="font-size:0.65rem;color:var(--text-muted);margin-left:0.4rem;">just now</span><div style="font-size:0.78rem;color:var(--text-secondary);margin-top:0.2rem;">${text.replace(/</g,'&lt;')}</div>`;
+  input.parentElement.before(commentDiv);
+  input.value = '';
+  // In production, POST to a comments Apps Script endpoint
+}
+
+function setVesselFilter(btn) {
+  const group = btn.parentElement;
+  group.querySelectorAll('.toggle-option').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeVessel = btn.dataset.value;
+  applyFilters();
+}
+
+function applyFilters() {
+  addMarkers();
+  updateStats();
+}
+
+function updateStats() {
+  const filtered = getFilteredSightings();
+  document.getElementById('totalSightings').textContent = filtered.length;
+  const speciesSet = new Set(filtered.map(s => s.species));
+  document.getElementById('totalSpecies').textContent = speciesSet.size;
+}
+
+function clearAllFilters() {
+  // Reset species
+  activeFilters = new Set([...Object.keys(SPECIES_COLORS), ...liveSightings.map(s => s.species)]);
+  document.querySelectorAll('#speciesFilters input').forEach(cb => cb.checked = true);
+  // Reset area
+  document.getElementById('areaFilter').value = '';
+  // Reset date range (time slider)
+  activeDateRange = 'all';
+  const slider = document.getElementById('timeSlider');
+  if (slider) { slider.value = 5; }
+  const sliderLabel = document.getElementById('timeSliderLabel');
+  if (sliderLabel) { sliderLabel.textContent = 'All Time'; }
+  // Reset vessel
+  activeVessel = 'any';
+  document.querySelectorAll('#vesselGroup .toggle-option').forEach(b => b.classList.remove('active'));
+  document.querySelector('#vesselGroup [data-value="any"]').classList.add('active');
+  applyFilters();
+}
+
+// ─── CSV EXPORT ───
+// Exports the currently loaded data (sample or live) — public fields only.
+function downloadCSV() {
+  const headers = ['Species','Count','Behavior','Location','Latitude','Longitude','Date','Time','Vessels_Nearby'];
+  const rows = liveSightings.map(s =>
+    [s.species, s.count, s.behavior, `"${s.location}"`, s.lat, s.lng, s.date, s.time, s.vessel_count || 0].join(',')
+  );
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'alaskamarineanimalwatch-cwi-data.csv';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ─── INIT ───
+// Always open in light (Field Station). The toggle switches within the session.
+setTheme('light');
+
+// Show/hide "Other" description field on violation form
+document.querySelector('#violationForm select[name="violation_type"]').addEventListener('change', function() {
+  const otherGroup = document.getElementById('otherViolationGroup');
+  otherGroup.style.display = this.value === 'Other' ? 'block' : 'none';
+});
+
+// Show/hide "Other" species field on sighting form
+document.querySelector('#sightingForm select[name="species"]').addEventListener('change', function() {
+  document.getElementById('otherSpeciesGroup').style.display = this.value === 'Other' ? 'block' : 'none';
+});
+
+// Show/hide "Other" field on feedback form
+document.querySelector('#feedbackForm select[name="feedback_type"]').addEventListener('change', function() {
+  document.getElementById('otherFeedbackGroup').style.display = this.value === 'Other' ? 'block' : 'none';
+});
+
+// ─── MAP LAYERS: basemap switch + AIS + wind overlays (prototype) ───
+// Basemap: Chart (CARTO, follows theme) vs Satellite (Esri World Imagery).
+function setBaseMap(btn) {
+  document.querySelectorAll('#baseMapGroup .toggle-option').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (!window._map) return;
+  const want = btn.dataset.value;
+  if (want === window._baseMap) return;
+  window._baseMap = want;
+  if (window._tileLayer) window._tileLayer.remove();
+  window._tileLayer = want === 'satellite'
+    ? L.tileLayer(SAT_TILE, { attribution: SAT_ATTR, maxZoom: 18 }).addTo(window._map)
+    : L.tileLayer(MAP_TILES[document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'], { attribution: CARTO_ATTR, maxZoom: 18 }).addTo(window._map);
+}
+
+// Sample AIS traffic for prototype demo. In production: live vessel data
+// via a scheduled feed (source partner TBD — attribution added when the
+// agreement is signed).
+const SAMPLE_AIS = [
+  { name: 'M/V LeConte', kind: 'Alaska Marine Highway ferry', sog: 14.2, cog: 245, lat: 58.35, lng: -134.65 },
+  { name: 'F/V Northern Mariner', kind: 'Commercial fishing vessel', sog: 7.5, cog: 30, lat: 57.30, lng: -133.70 },
+  { name: 'M/V Aurora Explorer', kind: 'Charter vessel', sog: 18.0, cog: 120, lat: 57.42, lng: -134.50 },
+  { name: 'Tug Dawn Hunter + barge', kind: 'Towboat', sog: 6.0, cog: 310, lat: 58.45, lng: -134.90 },
+  { name: 'F/V Sitka Bay', kind: 'Commercial fishing vessel', sog: 0.0, cog: 0, lat: 57.05, lng: -135.30 }
+];
+const AIS_SHAPE = '<svg viewBox="0 0 10 10" width="16" height="16"><path d="M5,0.8 L8.6,9.2 L5,7.4 L1.4,9.2 Z" fill="#94A8C4" stroke="#fff" stroke-width="0.7"/></svg>';
+const AIS_ANCHORED = '<svg viewBox="0 0 10 10" width="16" height="16"><rect x="2.8" y="2.8" width="4.4" height="4.4" transform="rotate(45 5 5)" fill="#94A8C4" stroke="#fff" stroke-width="0.7"/></svg>';
+
+function toggleAIS(on) {
+  if (!window._map) return;
+  if (on && !window._aisGroup) {
+    window._aisGroup = L.layerGroup(SAMPLE_AIS.map(v => {
+      const still = v.sog === 0;
+      const icon = L.divIcon({
+        className: 'ais-marker',
+        html: `<div style="transform:rotate(${still ? 0 : v.cog}deg);width:16px;height:16px;">${still ? AIS_ANCHORED : AIS_SHAPE}</div>`,
+        iconSize: [16, 16], iconAnchor: [8, 8]
+      });
+      return L.marker([v.lat, v.lng], { icon }).bindPopup(`
+        <div class="popup-title">${v.name}</div>
+        <div class="popup-detail"><strong>Type:</strong> ${v.kind}</div>
+        <div class="popup-detail"><strong>Speed:</strong> ${v.sog.toFixed(1)} kn</div>
+        <div class="popup-detail"><strong>Heading:</strong> ${still ? 'Anchored' : v.cog + '\u00B0'}</div>
+        <div class="popup-detail" style="font-size:0.66rem;color:var(--text-muted);">AIS vessel data · sample</div>
+      `, { maxWidth: 240 });
+    }));
+  }
+  if (window._aisGroup) { on ? window._aisGroup.addTo(window._map) : window._map.removeLayer(window._aisGroup); }
+}
+
+// Sample wind for prototype demo. In production: live weather feed via a
+// scheduled Edge Function. Arrow points downwind; tooltip gives the
+// from-direction.
+const SAMPLE_WIND = [
+  { kt: 18, from: 'SE', toward: 315, lat: 58.30, lng: -134.60 },
+  { kt: 12, from: 'S', toward: 0, lat: 57.35, lng: -134.40 },
+  { kt: 22, from: 'SE', toward: 315, lat: 57.00, lng: -135.20 },
+  { kt: 8, from: 'E', toward: 270, lat: 56.80, lng: -132.95 },
+  { kt: 15, from: 'S', toward: 0, lat: 58.15, lng: -135.60 },
+  { kt: 10, from: 'N', toward: 180, lat: 55.40, lng: -131.65 }
+];
+
+function toggleWind(on) {
+  if (!window._map) return;
+  if (on && !window._windGroup) {
+    window._windGroup = L.layerGroup(SAMPLE_WIND.map(w => {
+      const icon = L.divIcon({
+        className: 'wind-marker',
+        html: `<svg width="22" height="22" viewBox="0 0 22 22"><g transform="rotate(${w.toward},11,11)"><line x1="11" y1="5.5" x2="11" y2="17.5" stroke="#7FB9D8" stroke-width="1.8" stroke-linecap="round"/><path d="M7.6,8.4 L11,4.4 L14.4,8.4" stroke="#7FB9D8" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></svg>`,
+        iconSize: [22, 22], iconAnchor: [11, 11]
+      });
+      return L.marker([w.lat, w.lng], { icon }).bindTooltip(`${w.from} wind · ${w.kt} kt`, { direction: 'top', offset: [0, -10] });
+    }));
+  }
+  if (window._windGroup) { on ? window._windGroup.addTo(window._map) : window._map.removeLayer(window._windGroup); }
+}
+
+// ─── PATCH WALL VIEWER (prototype) ───
+// Patch glyphs: %%C%% is the thread color, replaced per patch.
+const PATCH_GLYPHS = {
+  fluke: '<svg viewBox="-20 -20 40 40" width="32" height="32" fill="none"><path d="M0,-13 C8,-13 14,-6 17,10 C11,3 6,3 0,7 C-6,3 -11,3 -17,10 C-14,-6 -8,-13 0,-13 Z" fill="%%C%%" fill-opacity="0.18" stroke="%%C%%" stroke-width="2" stroke-linejoin="round"/></svg>',
+  orca: '<svg viewBox="-20 -20 40 40" width="32" height="32" fill="none"><path d="M2,-14 C7,-7 9,1 11,10 L-4,9 C-2,2 0,-6 2,-14 Z" fill="%%C%%" fill-opacity="0.18" stroke="%%C%%" stroke-width="2" stroke-linejoin="round"/><path d="M-12,14 Q-6,10.5 0,14 T12,14" stroke="%%C%%" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  streak: '<svg viewBox="-20 -20 40 40" width="32" height="32" fill="none"><circle cx="-8" cy="7" r="2.6" fill="%%C%%"/><circle cx="0" cy="-1" r="2.6" fill="%%C%%"/><circle cx="8" cy="-9" r="2.6" fill="%%C%%"/></svg>',
+  anchor: '<svg viewBox="-20 -20 40 40" width="32" height="32" fill="none" stroke="%%C%%" stroke-width="2" stroke-linecap="round"><circle cx="0" cy="-10" r="3.2"/><line x1="0" y1="-6.8" x2="0" y2="11"/><line x1="-5.5" y1="0" x2="5.5" y2="0"/><path d="M-8.5,7.5 C-7,15.5 7,15.5 8.5,7.5"/></svg>'
+};
+function patchGlyph(id, color) {
+  return (PATCH_GLYPHS[id] || PATCH_GLYPHS.streak).replace(/%%C%%/g, color);
+}
+
+// Sample member patch walls for prototype demo.
+// public:false = private wall (pinned patch still shows on the Leaderboard).
+const MEMBER_PATCHES = {
+  TidesWithTara: { public: true, patches: [
+    { glyph:'fluke', name:'Fluke ID Match', sub:'HW-2026-041 · May 12', color:'#7AE8D1', pinned:true },
+    { glyph:'orca', name:'First-of-Season Orca', sub:'May 3', color:'#E8634A' },
+    { glyph:'streak', name:'Named-Pod Streak', sub:'T-pod · 3 weeks', color:'#B5DBEC' },
+    { glyph:'anchor', name:'Supporter', sub:'2026 beta', color:'#F0A830', supporter:true }
+  ]},
+  SitkaSalt: { public: true, patches: [
+    { glyph:'orca', name:'First-of-Season Orca', sub:'May 19', color:'#E8634A', pinned:true },
+    { glyph:'fluke', name:'Fluke ID Match', sub:'HW-2026-012 · Apr 30', color:'#7AE8D1' },
+    { glyph:'anchor', name:'Supporter', sub:'2026 beta', color:'#F0A830', supporter:true }
+  ]},
+  FerryDeckDave: { public: true, patches: [
+    { glyph:'streak', name:'Named-Pod Streak', sub:'T-pod · 5 weeks', color:'#B5DBEC', pinned:true },
+    { glyph:'fluke', name:'Fluke ID Match', sub:'HW-2026-077 · Jun 2', color:'#7AE8D1' }
+  ]},
+  KelpForestKai: { public: true, patches: [
+    { glyph:'fluke', name:'Fluke ID Match', sub:'HW-2025-311 · Oct 2025', color:'#7AE8D1', pinned:true },
+    { glyph:'anchor', name:'Supporter', sub:'2026 beta', color:'#F0A830', supporter:true }
+  ]},
+  MistyFjordMarla: { public: true, patches: [
+    { glyph:'orca', name:'First-of-Season Orca', sub:'May 5', color:'#E8634A', pinned:true }
+  ]},
+  ChathamChartCo: { public: true, patches: [
+    { glyph:'anchor', name:'Supporter', sub:'2026 beta', color:'#F0A830', supporter:true, pinned:true }
+  ]},
+  IcyStraitIvy: { public: false, patches: [] },
+  OldHarborHank: { public: false, patches: [] }
+};
+
+function openPatchWall(handle) {
+  const m = MEMBER_PATCHES[handle];
+  const overlay = document.getElementById('pwOverlay');
+  const grid = document.getElementById('pwGrid');
+  const privateBox = document.getElementById('pwPrivate');
+  document.getElementById('pwHandle').textContent = handle;
+  if (!m || !m.public) {
+    grid.style.display = 'none';
+    privateBox.style.display = 'block';
+  } else {
+    privateBox.style.display = 'none';
+    grid.style.display = 'flex';
+    grid.innerHTML = m.patches.map(p => `
+      <div class="patch-card">
+        <div class="sewn-patch${p.supporter ? ' supporter' : ''}" style="--ring:${p.color}">
+          <span class="ring"></span><span class="stitch"></span>
+          <span class="sewn-glyph">${patchGlyph(p.glyph, p.color)}</span>
+        </div>
+        <div class="patch-name">${p.name}</div>
+        <div class="patch-sub">${p.sub}</div>
+        ${p.pinned ? '<div class="pin-tag">Pinned</div>' : ''}
+      </div>`).join('');
+  }
+  overlay.classList.add('open');
+}
+function closePatchWall() {
+  document.getElementById('pwOverlay').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePatchWall(); });
+
+/* ─── REPORT FLOW (community moderation, prototype) ─── */
+function openReport(sightingIdx) {
+  const subj = document.getElementById('rpSubject');
+  if (typeof sightingIdx === 'number' && liveSightings[sightingIdx]) {
+    const s = liveSightings[sightingIdx];
+    subj.textContent = 'Report: ' + s.species + ' sighting near ' + s.location;
+  } else {
+    subj.textContent = 'Report a problem';
+  }
+  document.getElementById('rpForm').style.display = 'block';
+  document.getElementById('rpDone').style.display = 'none';
+  document.getElementById('rpOverlay').classList.add('open');
+}
+function closeReport() {
+  document.getElementById('rpOverlay').classList.remove('open');
+}
+function submitReport(ev) {
+  ev.preventDefault();
+  document.getElementById('rpForm').style.display = 'none';
+  document.getElementById('rpDone').style.display = 'block';
+  return false;
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeReport(); });
+
+/* ─── MY SIGHTINGS — owner's logbook deep view (prototype) ───
+   In the real app this is a Supabase query: the user's own sightings
+   (observer_id = auth.uid) joined to sightings_comments by sighting_id. */
+const MY_SIGHTINGS = [
+  { idx: 0, share: 'credit' },
+  { idx: 8, share: 'anonymous' },
+  { idx: 9, share: 'private' }
+];
+const SHARE_LABELS = {
+  credit: 'Public with credit',
+  anonymous: 'Public · anonymous',
+  private: 'Private logbook'
+};
+const SHARE_NOTES = {
+  credit: 'Your handle shows with this sighting across the app and in the public CWI record.',
+  anonymous: 'The sighting is public — only you know it was you. This is the default.',
+  private: 'Only you can see this sighting. It stays off the map and out of the public record.'
+};
+function mySightingData(e) {
+  return (typeof liveSightings !== 'undefined' && liveSightings[e.idx]) || SAMPLE_SIGHTINGS[e.idx];
+}
+function threadCount(e) {
+  const t = sampleThreads[e.idx] || [];
+  return t.reduce((n, x) => n + 1 + x.replies.length, 0);
+}
+function fmtSightDate(s) {
+  const dt = new Date(s.date + 'T00:00:00');
+  return dt.toLocaleString('en-US', { month: 'short' }).toUpperCase() + ' ' + dt.getDate() + ' · ' + (s.time || '');
+}
+function renderMySightings() {
+  const list = document.getElementById('mySightingsList');
+  if (!list) return;
+  list.innerHTML = MY_SIGHTINGS.map((e, i) => {
+    const s = mySightingData(e);
+    const color = SPECIES_COLORS[s.species] || SPECIES_COLORS['Other'];
+    const n = threadCount(e);
+    const disc = n ? n + (n === 1 ? ' reply' : ' replies') : 'No discussion yet';
+    return `
+      <div class="sighting-row" style="cursor:pointer;" onclick="openLogbook(${i})">
+        <span class="species-dot" style="background:${color};"></span>
+        <span style="flex:1;">
+          <div class="sighting-what">${s.species} — ${s.behavior}</div>
+          <div class="sighting-where">${s.location} · ${disc} · ${SHARE_LABELS[e.share]}</div>
+        </span>
+        <span class="sighting-date">${fmtSightDate(s)}</span>
+      </div>`;
+  }).join('');
+}
+function openLogbook(i) {
+  const e = MY_SIGHTINGS[i];
+  if (!e) return;
+  const s = mySightingData(e);
+  const vd = VESSEL_DENSITY.getLevel(s.vessel_count);
+  const n = threadCount(e);
+  document.getElementById('lbTitle').textContent = s.species + ' — ' + s.behavior;
+  document.getElementById('lbSub').textContent = fmtSightDate(s) + ' · ' + s.location;
+
+  const rec = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem 1rem;margin-top:1.1rem;">
+      <div><div style="font-family:var(--font-display);font-size:0.66rem;font-weight:600;letter-spacing:0.04em;color:var(--text-muted);">COUNT</div><div style="font-size:0.85rem;color:var(--text-primary);">${s.count}</div></div>
+      <div><div style="font-family:var(--font-display);font-size:0.66rem;font-weight:600;letter-spacing:0.04em;color:var(--text-muted);">BEHAVIOR</div><div style="font-size:0.85rem;color:var(--text-primary);">${s.behavior}</div></div>
+      <div><div style="font-family:var(--font-display);font-size:0.66rem;font-weight:600;letter-spacing:0.04em;color:var(--text-muted);">DATE &amp; TIME</div><div style="font-size:0.85rem;color:var(--text-primary);">${s.date}${s.time ? ' at ' + s.time : ''}</div></div>
+      <div><div style="font-family:var(--font-display);font-size:0.66rem;font-weight:600;letter-spacing:0.04em;color:var(--text-muted);">VESSELS NEARBY</div><div style="font-size:0.85rem;color:var(--text-primary);">${vd.label}</div></div>
+    </div>`;
+
+  const share = `
+    <div style="margin-top:1.1rem;padding-top:1rem;border-top:1px solid var(--border-subtle);">
+      <div style="font-family:var(--font-display);font-size:0.75rem;font-weight:700;margin-bottom:0.5rem;">How this sighting appears publicly</div>
+      <div class="toggle-group">
+        ${['credit', 'anonymous', 'private'].map(k => `<button type="button" class="toggle-option${e.share === k ? ' active' : ''}" data-k="${k}" onclick="setShareState(this,${i})">${SHARE_LABELS[k]}</button>`).join('')}
+      </div>
+      <p id="lbShareNote" style="font-size:0.72rem;color:var(--text-muted);margin-top:0.5rem;margin-bottom:0;line-height:1.5;">${SHARE_NOTES[e.share]}</p>
+    </div>`;
+
+  const fn = sampleFieldNotes[e.idx];
+  const thread = sampleThreads[e.idx] || [];
+  const fnHTML = fn
+    ? `<div style="background:var(--surface-raised);padding:0.5rem 0.6rem;border-radius:6px;margin-bottom:0.4rem;"><strong style="font-size:0.75rem;color:var(--teal);">${fn.author}</strong><span style="font-size:0.65rem;color:var(--text-muted);margin-left:0.4rem;">${fn.time}</span><div style="font-size:0.78rem;color:var(--text-secondary);margin-top:0.2rem;">${fn.text}</div></div>`
+    : '<div style="font-size:0.78rem;color:var(--text-muted);font-style:italic;margin-bottom:0.4rem;">No field note on this sighting.</div>';
+  const threadHTML = thread.length
+    ? thread.map(t => `<div style="background:var(--surface-raised);padding:0.5rem 0.6rem;border-radius:6px;margin-bottom:0.4rem;"><strong style="font-size:0.75rem;color:var(--teal);">${t.author}</strong><span style="font-size:0.65rem;color:var(--text-muted);margin-left:0.4rem;">${t.time}</span><div style="font-size:0.78rem;color:var(--text-secondary);margin-top:0.2rem;">${t.text}</div>${t.replies.map(r => `<div style="border-left:2px solid var(--border-subtle);margin:0.4rem 0 0 0.5rem;padding:0.3rem 0 0.3rem 0.6rem;"><strong style="font-size:0.72rem;color:var(--teal);">${r.author}</strong><span style="font-size:0.62rem;color:var(--text-muted);margin-left:0.4rem;">${r.time}</span><div style="font-size:0.75rem;color:var(--text-secondary);margin-top:0.15rem;">${r.text}</div></div>`).join('')}</div>`).join('')
+    : '<div style="font-size:0.78rem;color:var(--text-muted);font-style:italic;">No discussion yet — when someone replies to this sighting, it shows up here.</div>';
+
+  const discussion = `
+    <div style="margin-top:0.9rem;border-top:1px solid var(--border-subtle);padding-top:0.8rem;">
+      <div style="font-family:var(--font-display);font-size:0.75rem;font-weight:700;margin-bottom:0.4rem;">Field note <span style="font-weight:400;color:var(--text-muted);">· shared by the reporter</span></div>
+      ${fnHTML}
+      <div style="font-family:var(--font-display);font-size:0.75rem;font-weight:700;margin:0.5rem 0 0.4rem;">Discussion <span style="font-weight:400;color:var(--text-muted);">· ${n} ${n === 1 ? 'reply' : 'replies'}</span></div>
+      ${threadHTML}
+    </div>
+    <button type="button" onclick="closeLogbook();showPage('map');" style="margin-top:1rem;width:100%;padding:0.5rem 1rem;border:1px solid var(--border-subtle);border-radius:8px;background:var(--surface-raised);color:var(--text-primary);font-family:var(--font-display);font-weight:600;font-size:0.8rem;cursor:pointer;">View on the map</button>`;
+
+  document.getElementById('lbBody').innerHTML = rec + share + discussion;
+  document.getElementById('lbOverlay').classList.add('open');
+}
+function setShareState(btn, i) {
+  const e = MY_SIGHTINGS[i];
+  if (!e) return;
+  e.share = btn.dataset.k;
+  btn.parentElement.querySelectorAll('.toggle-option').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const note = document.getElementById('lbShareNote');
+  if (note) note.textContent = SHARE_NOTES[e.share];
+  renderMySightings();
+}
+function closeLogbook() {
+  document.getElementById('lbOverlay').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLogbook(); });
+renderMySightings();
+</script>
+
+<!-- ─── FLOATING PROTOTYPE DISCLAIMER ─── -->
+<div class="proto-badge" id="protoBadge">
+  <span>Working prototype — the app may look slightly different.</span>
+  <button type="button" class="proto-badge-close" onclick="this.parentElement.remove()" aria-label="Dismiss">&times;</button>
+</div>
+
+<!-- ─── PATCH WALL VIEWER MODAL ─── -->
+<div class="pw-overlay" id="pwOverlay" onclick="if(event.target===this)closePatchWall()" role="dialog" aria-modal="true" aria-label="Patch wall">
+  <div class="pw-panel">
+    <button type="button" class="pw-close" onclick="closePatchWall()" aria-label="Close patch wall">×</button>
+    <div class="pw-handle" id="pwHandle"></div>
+    <div class="pw-sub">Patch wall</div>
+    <div class="pw-grid" id="pwGrid"></div>
+    <div class="pw-private" id="pwPrivate" style="display:none;">
+      This watcher keeps their patch wall private. Their pinned patch still shows on the Leaderboard — some people just watch quietly.
+    </div>
+  </div>
+</div>
+
+<!-- ─── REPORT MODAL ─── -->
+<div class="pw-overlay" id="rpOverlay" onclick="if(event.target===this)closeReport()" role="dialog" aria-modal="true" aria-label="Report a problem">
+  <div class="pw-panel">
+    <button type="button" class="pw-close" onclick="closeReport()" aria-label="Close report">&times;</button>
+    <div class="pw-handle" id="rpSubject">Report a problem</div>
+    <div class="pw-sub">Confidential — seen by moderators only</div>
+    <form id="rpForm" onsubmit="return submitReport(event)">
+      <div style="margin-top:1.1rem;">
+        <label for="rpReason" style="font-family:var(--font-display);font-size:0.72rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:0.3rem;">Reason</label>
+        <select id="rpReason" style="width:100%;padding:0.45rem 0.5rem;font-size:0.82rem;border:1px solid var(--border-subtle);border-radius:6px;background:var(--navy-deep);color:var(--text-primary);font-family:var(--font-body);">
+          <option>Harassment or personal attack</option>
+          <option>Names or accuses a boat or operator</option>
+          <option>False or misleading sighting</option>
+          <option>Off topic or spam</option>
+          <option>Something else</option>
+        </select>
+      </div>
+      <div style="margin-top:0.8rem;">
+        <label for="rpNote" style="font-family:var(--font-display);font-size:0.72rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:0.3rem;">Details (optional)</label>
+        <textarea id="rpNote" rows="3" placeholder="Tell a moderator what's going on. Don't argue in the thread — report it and let a moderator handle it." style="width:100%;padding:0.45rem 0.5rem;font-size:0.82rem;border:1px solid var(--border-subtle);border-radius:6px;background:var(--navy-deep);color:var(--text-primary);font-family:var(--font-body);resize:vertical;"></textarea>
+      </div>
+      <button type="submit" style="margin-top:1rem;width:100%;padding:0.55rem 1rem;border:none;border-radius:8px;background:var(--teal);color:var(--navy-deep);font-family:var(--font-display);font-weight:700;font-size:0.85rem;cursor:pointer;">Send report</button>
+      <p style="font-size:0.7rem;color:var(--text-muted);margin-top:0.6rem;line-height:1.5;">Reports are confidential. We never tell anyone who reported what.</p>
+    </form>
+    <div id="rpDone" style="display:none;">
+      <p style="margin-top:1.1rem;font-size:0.85rem;color:var(--text-secondary);line-height:1.6;">Thanks — a moderator will review this. If it breaks the community guidelines, it comes down, and we tell the person why.</p>
+      <button type="button" onclick="closeReport()" style="margin-top:0.8rem;padding:0.45rem 1rem;border:1px solid var(--border-subtle);border-radius:8px;background:var(--surface-raised);color:var(--text-primary);font-family:var(--font-display);font-weight:600;font-size:0.8rem;cursor:pointer;">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── LOGBOOK DETAIL MODAL ─── -->
+<div class="pw-overlay" id="lbOverlay" onclick="if(event.target===this)closeLogbook()" role="dialog" aria-modal="true" aria-label="Sighting detail">
+  <div class="pw-panel" style="max-width:480px;">
+    <button type="button" class="pw-close" onclick="closeLogbook()" aria-label="Close sighting detail">&times;</button>
+    <div class="pw-handle" id="lbTitle"></div>
+    <div class="pw-sub" id="lbSub"></div>
+    <div id="lbBody"></div>
+  </div>
+</div>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" nonce="YcxQsRAUhTx1xXFMcdVSzQ==" data-cf-beacon='{"version":"2024.11.0","token":"36b4216ae2dc4d5488c249161e71fe1e","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
