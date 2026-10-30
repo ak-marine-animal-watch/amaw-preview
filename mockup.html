@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
+  <!-- Google tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-EF459FGJPY"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-EF459FGJPY');
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta property="og:title" content="Alaska Marine Animal Watch Community Wildlife Interactions">
@@ -945,7 +953,7 @@ h1, h2, h3, h4, .section-title, .hero-sub1, .hero-sub2 { text-wrap: balance; }
       </div>
       <button class="nav-link" onclick="showPage('map')">Sighting Map</button>
       <button class="nav-link" onclick="showPage('gallery')">Gallery</button>
-      <button class="nav-link" onclick="showPage('leaderboard')">Leaderboard</button>
+      <button class="nav-link" onclick="showPage('leaderboard')">Top Sightings</button>
       <button class="nav-link" onclick="showPage('profile')">Profile</button>
       <button class="nav-link" onclick="showPage('why')">Our Mission</button>
       <button class="nav-link" onclick="showPage('about')">About</button>
@@ -1494,19 +1502,6 @@ h1, h2, h3, h4, .section-title, .hero-sub1, .hero-sub2 { text-wrap: balance; }
       </p>
     </div>
     <div class="info-card">
-      <h2>How We Use AI</h2>
-      <p>
-        Alaska Marine Animal Watch is built with AI assistance. Our coding assistant is <a href="https://mistral.ai/about/" target="_blank" rel="noopener noreferrer" style="color:var(--teal); font-weight:700;"><strong>Vibe</strong></a>, made by <strong>Mistral AI</strong> — an independent AI company based in Paris, France.
-      </p>
-      <p>
-        What this means in practice: AI helps write and refine this platform's code, under human direction. It does not decide what we build, how we moderate, or what happens to your data. Every product, privacy, and community decision here is made by a person. Your sightings, photos, and reports are not used to train anyone's AI.
-      </p>
-      <p>
-        Questions about our use of AI? Ask us directly:
-        <a href="mailto:hello@alaskamarineanimalwatch.com" style="color:var(--teal); text-decoration:none; font-family:var(--font-display); font-weight:600;">hello@alaskamarineanimalwatch.com</a>
-      </p>
-    </div>
-    <div class="info-card">
       <h2>Community Guidelines</h2>
       <p>
         Alaska Marine Animal Watch is a moderated community. Moderation doesn't mean censorship, but it's how the record stays worth trusting. Three rules cover most everything:
@@ -1540,15 +1535,34 @@ h1, h2, h3, h4, .section-title, .hero-sub1, .hero-sub2 { text-wrap: balance; }
         We believe the best way to protect Southeast Alaska's marine ecosystem is to put real data in the hands of the people who can use it. The full CWI record — species, location, behavior, count, and date — is publicly downloadable from the map page. No fees and no gatekeeping.
       </p>
 
+      <h3>How We Use the Money</h3>
+      <p>
+        Once a year, we post the total donations the community sent us, and the total cost of keeping Alaska Marine Animal Watch running — hosting, maps, data storage, and the stuff in between. We want you to see exactly what your support pays for!
+      </p>
+
       <h3>How the Data Flows</h3>
       <p>
         When you submit a sighting, the report routes to a secure database. A public tab containing only species, location, behavior, date, and animal count feeds the sighting map in near real-time. Your name and contact information stay in a private tab that only Alaska Marine Animal Watch administrators can access.
-        
-        <p>Concern reports follow a separate, fully private pipeline — never published or displayed on the map. Reporter identity on all concern reports is always confidential.</p>
+      </p>
+      <p>
+        Concern reports follow a separate, fully private pipeline — never published or displayed on the map. Reporter identity on all concern reports is always confidential.
       </p>
       <p style="margin-top:1.25rem; padding-top:1.25rem; border-top:1px solid var(--border-subtle);">
         <span style="font-family:var(--font-display); font-weight:600; color:var(--text-primary);">Media Inquiries, Research Partnerships, and Data Requests:</span>
         <a href="mailto:hello@alaskamarineanimalwatch.com" style="color:var(--teal); text-decoration:none; margin-left:0.35rem; font-family:var(--font-display); font-weight:600;">hello@alaskamarineanimalwatch.com</a>
+      </p>
+    </div>
+    <div class="info-card">
+      <h2>How We Use AI</h2>
+      <p>
+        Alaska Marine Animal Watch is built with AI assistance. Our coding assistant is <a href="https://mistral.ai/about/" target="_blank" rel="noopener noreferrer" style="color:var(--teal); font-weight:700;"><strong>Vibe</strong></a>, made by <strong>Mistral AI</strong> — an independent AI company based in Paris, France.
+      </p>
+      <p>
+        What this means in practice: AI helps write and refine this platform's code, under human direction. It does not decide what we build, how we moderate, or what happens to your data. Every product, privacy, and community decision here is made by a person. Your sightings, photos, and reports are not used to train anyone's AI.
+      </p>
+      <p>
+        Questions about our use of AI? Ask us directly:
+        <a href="mailto:hello@alaskamarineanimalwatch.com" style="color:var(--teal); text-decoration:none; font-family:var(--font-display); font-weight:600;">hello@alaskamarineanimalwatch.com</a>
       </p>
     </div>
   </div>
@@ -1675,21 +1689,21 @@ h1, h2, h3, h4, .section-title, .hero-sub1, .hero-sub2 { text-wrap: balance; }
 <div class="page info-page" id="page-leaderboard">
   <div class="info-section">
     <div class="section-header">
-      <div class="section-label">Community Sightings Leaderboard</div>
-      <h2 class="section-title">This Month's Contributors</h2>
-      <p class="section-subtitle">Curious about who's making the most sightings? This leaderboard shows the top contributors of the month! Public and private sightings are both counted.</p>
+      <div class="section-label">Community</div>
+      <h2 class="section-title">This Month's Top Sightings</h2>
+      <p class="section-subtitle">Curious about who's making the most sightings? This page shows the month's top sightings, credited to the handles that logged them. Public and private sightings are both counted.</p>
     </div>
     <div class="info-card" style="padding:0;">
       <div class="lb-row lb-head">
-        <span style="text-align:center;">#</span><span>Watcher</span><span>Sightings</span><span>Streak</span>
+        <span style="text-align:center;">#</span><span>Contributor</span><span>Sightings</span><span>Streak</span>
       </div>
       <div class="lb-row">
         <span class="lb-rank"><span class="lb-rank-badge">1</span></span>
         <span class="lb-who">
-          <span class="avatar lb-avatar">TT<span class="mini-patch" style="--ring:#7AE8D1;"></span></span>
+          <span class="avatar lb-avatar">FB<span class="mini-patch" style="--ring:#7AE8D1;"></span></span>
           <span>
-            <div class="lb-handle">TidesWithTara</div><div class="lb-port">Auke Bay, Juneau</div>
-            <div class="lb-patch-row"><span class="lb-patch"><span class="patch-dot" style="background:#7AE8D1;"></span>Fluke ID Match</span><button type="button" class="lb-pw-link" onclick="openPatchWall('TidesWithTara')">Patch Wall →</button></div>
+            <div class="lb-handle">FlamesBiggestFan</div><div class="lb-port">Auke Bay, Juneau</div>
+            <div class="lb-patch-row"><span class="lb-patch"><span class="patch-dot" style="background:#7AE8D1;"></span>Fluke ID Match</span><button type="button" class="lb-pw-link" onclick="openPatchWall('FlamesBiggestFan')">Patch Wall →</button></div>
           </span>
         </span>
         <span class="lb-num">14</span>
@@ -1700,7 +1714,7 @@ h1, h2, h3, h4, .section-title, .hero-sub1, .hero-sub2 { text-wrap: balance; }
         <span class="lb-who">
           <span class="avatar lb-avatar">SS<span class="mini-patch" style="--ring:#E8634A;"></span></span>
           <span>
-            <div class="lb-handle">SitkaSalt</div><div class="lb-port">Sitka</div>
+            <div class="lb-handle">OldSalty</div><div class="lb-port">Sitka</div>
             <div class="lb-patch-row"><span class="lb-patch"><span class="patch-dot" style="background:#E8634A;"></span>First-of-Season Orca</span><button type="button" class="lb-pw-link" onclick="openPatchWall('SitkaSalt')">Patch Wall →</button></div>
           </span>
         </span>
@@ -1712,7 +1726,7 @@ h1, h2, h3, h4, .section-title, .hero-sub1, .hero-sub2 { text-wrap: balance; }
         <span class="lb-who">
           <span class="avatar lb-avatar">FD<span class="mini-patch" style="--ring:#B5DBEC;"></span></span>
           <span>
-            <div class="lb-handle">FerryDeckDave</div><div class="lb-port">Juneau</div>
+            <div class="lb-handle">GooseIsMyBaby</div><div class="lb-port">Juneau</div>
             <div class="lb-patch-row"><span class="lb-patch"><span class="patch-dot" style="background:#B5DBEC;"></span>Named-Pod Streak</span><button type="button" class="lb-pw-link" onclick="openPatchWall('FerryDeckDave')">Patch Wall →</button></div>
           </span>
         </span>
@@ -1724,7 +1738,7 @@ h1, h2, h3, h4, .section-title, .hero-sub1, .hero-sub2 { text-wrap: balance; }
         <span class="lb-who">
           <span class="avatar lb-avatar">KK<span class="mini-patch" style="--ring:#7AE8D1;"></span></span>
           <span>
-            <div class="lb-handle">KelpForestKai</div><div class="lb-port">Ketchikan</div>
+            <div class="lb-handle">CetaceanSighter3</div><div class="lb-port">Ketchikan</div>
             <div class="lb-patch-row"><span class="lb-patch"><span class="patch-dot" style="background:#7AE8D1;"></span>Fluke ID Match</span><button type="button" class="lb-pw-link" onclick="openPatchWall('KelpForestKai')">Patch Wall →</button></div>
           </span>
         </span>
@@ -1736,7 +1750,7 @@ h1, h2, h3, h4, .section-title, .hero-sub1, .hero-sub2 { text-wrap: balance; }
         <span class="lb-who">
           <span class="avatar lb-avatar">MM<span class="mini-patch" style="--ring:#E8634A;"></span></span>
           <span>
-            <div class="lb-handle">MistyFjordMarla</div><div class="lb-port">Petersburg</div>
+            <div class="lb-handle">OttersAreMyFavorite</div><div class="lb-port">Petersburg</div>
             <div class="lb-patch-row"><span class="lb-patch"><span class="patch-dot" style="background:#E8634A;"></span>First-of-Season Orca</span><button type="button" class="lb-pw-link" onclick="openPatchWall('MistyFjordMarla')">Patch Wall →</button></div>
           </span>
         </span>
@@ -1760,7 +1774,7 @@ h1, h2, h3, h4, .section-title, .hero-sub1, .hero-sub2 { text-wrap: balance; }
         <span class="lb-who">
           <span class="avatar lb-avatar">IS<span class="mini-patch" style="--ring:#B5DBEC;"></span></span>
           <span>
-            <div class="lb-handle">IcyStraitIvy</div><div class="lb-port">Gustavus</div>
+            <div class="lb-handle">HalibutHuntingWhaleLover</div><div class="lb-port">Gustavus</div>
             <div class="lb-patch-row"><span class="lb-patch"><span class="patch-dot" style="background:#B5DBEC;"></span>Named-Pod Streak</span><button type="button" class="lb-pw-link" onclick="openPatchWall('IcyStraitIvy')">Patch Wall →</button></div>
           </span>
         </span>
@@ -1780,7 +1794,7 @@ h1, h2, h3, h4, .section-title, .hero-sub1, .hero-sub2 { text-wrap: balance; }
         <span class="lb-num">—</span>
       </div>
       <div class="lb-note">
-        Standings reset monthly · Season totals and streaks live in the Alaska Marine Animal Watch app. Patches and avatar pins show each watcher's pinned patch. Patch walls are opt-in public: open them with the Patch Wall link next to any name. Anonymous sightings still count — the board only shows handles, never names.
+        Standings reset monthly · Season totals and streaks live in your profile. Patches and avatar pins show each contributor's pinned patch. Patch walls are opt-in public. Anonymous sightings still count. This page shows handles only, never names.
       </div>
     </div>
   </div>
@@ -1790,8 +1804,8 @@ h1, h2, h3, h4, .section-title, .hero-sub1, .hero-sub2 { text-wrap: balance; }
 <div class="page info-page" id="page-profile">
   <div class="info-section">
     <div class="section-header">
-      <div class="section-label">Your Logbook</div>
-      <h2 class="section-title">TidesWithTara</h2>
+      <div class="section-label">Your Personal Logbook</div>
+      <h2 class="section-title">FlamesBiggestFan</h2>
       <p class="section-subtitle">Auke Bay, Juneau · watching these waters since March 2026</p>
     </div>
     <div class="profile-stats">
@@ -1802,10 +1816,10 @@ h1, h2, h3, h4, .section-title, .hero-sub1, .hero-sub2 { text-wrap: balance; }
     </div>
     <div class="info-card">
       <h3>Patches</h3>
-      <p style="margin-bottom:1rem;">Earned the Field Station way — by adding what you saw to the record.</p>
+      <p style="margin-bottom:1rem;">Earn patches by adding what you saw to the record! Anonymous sightings also earn patches.</p>
       <div class="pin-demo">
-        <span class="avatar avatar-lg">TT<span class="mini-patch" style="--ring:#7AE8D1;"></span></span>
-        <p><strong>Fluke ID Match</strong> is pinned to your avatar — the patch you're known by on the Leaderboard. Swap it for any patch on your wall, any time.</p>
+        <span class="avatar avatar-lg">FB<span class="mini-patch" style="--ring:#7AE8D1;"></span></span>
+        <p><strong>Fluke ID Match</strong> is pinned to your avatar. Swap it for any patch on your wall, any time.</p>
       </div>
       <div class="patch-wall">
         <div class="patch-card">
@@ -1831,26 +1845,26 @@ h1, h2, h3, h4, .section-title, .hero-sub1, .hero-sub2 { text-wrap: balance; }
         </div>
       </div>
       <p style="font-size:0.78rem; color:var(--text-muted); margin-top:0.9rem; margin-bottom:0;">
-        Supporter patches are always visually distinct — earned patches stay earned.
+        Supporter patches are purchased and visually distinct. You keep all your patches forever!
       </p>
       <div class="form-group" style="margin-top:1.2rem;">
         <label class="form-label">Patch wall visibility</label>
         <div class="toggle-group">
-          <button type="button" class="toggle-option active" data-group="patch_wall" data-value="public" onclick="setToggle(this)">Public</button>
-          <button type="button" class="toggle-option" data-group="patch_wall" data-value="private" onclick="setToggle(this)">Private</button>
+          <button type="button" class="toggle-option active" data-group="patch_wall" data-value="public" onclick="setToggle(this);updatePatchWallNote(this)">Public</button>
+          <button type="button" class="toggle-option" data-group="patch_wall" data-value="private" onclick="setToggle(this);updatePatchWallNote(this)">Private</button>
         </div>
-        <small style="display:block; margin-top:0.4rem; font-size:0.78rem; color:var(--text-muted); font-family:var(--font-display);">
-          Public walls are viewable from the Leaderboard — the Patch Wall link by each name. Private walls show only to you. Your pinned patch is always visible on your avatar.
+        <small id="patchWallNote" style="display:block; margin-top:0.4rem; font-size:0.78rem; color:var(--text-muted); font-family:var(--font-display); line-height:1.6;">
+          Your patch wall is public — anyone can view it from the Top Sightings page through the Patch Wall link by your name.
         </small>
       </div>
-      </p>
     </div>
     <div class="info-card">
       <h3>My Sightings</h3>
       <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 0.6rem 0;line-height:1.5;">
-        Your full record — every sighting, the discussion it sparked, and how it appears publicly. Tap any row for the deep view. Your three most recent are shown here; the app lists your whole history.
+        Every sighting, the discussion it sparked, and how it appears publicly. Tap any row for the deep view.
       </p>
       <div id="mySightingsList"></div>
+      <button type="button" id="moreSightingsBtn" onclick="toggleMoreSightings()" style="width:100%; margin-top:0.9rem; padding:0.5rem 1rem; border:1px solid var(--border-subtle); border-radius:8px; background:var(--surface-raised); color:var(--text-primary); font-family:var(--font-display); font-weight:600; font-size:0.8rem; cursor:pointer;">More sightings ↓</button>
     </div>
     <div class="info-card" style="padding:0; overflow:hidden;">
       <div class="empty-photo">
@@ -1858,7 +1872,7 @@ h1, h2, h3, h4, .section-title, .hero-sub1, .hero-sub2 { text-wrap: balance; }
         <span class="photo-credit">NOAA Ship Rainier · public domain</span>
         <div class="empty-line">
           <div class="empty-line-main">Your photo logbook starts here.</div>
-          <div class="empty-line-sub">Photos you share with a sighting will gather here.</div>
+          <div class="empty-line-sub">Photos you share with a sighting will appear here.</div>
         </div>
       </div>
     </div>
@@ -2133,14 +2147,14 @@ let liveSightings = [];
 
 // ─── SAMPLE FIELD NOTES + DISCUSSION THREADS (prototype demo, shared by map popups + logbook) ───
 const sampleFieldNotes = {
-  0: { author: 'TidesWithTara', text: 'Bubble-net feeding right off the point — glassy water, you could hear them breathe. The gulls gave it away first.', time: '07:40' },
+  0: { author: 'FlamesBiggestFan', text: 'Bubble-net feeding right off the point — glassy water, you could hear them breathe. The gulls gave it away first.', time: '07:40' },
   4: { author: 'KayakGuideMia', text: 'Rafted up in the kelp line all morning. Two moms with pups — gave them a wide berth.', time: '09:15' }
 };
 const sampleThreads = {
   0: [
-    { author: 'Captain Dave', text: 'Saw this group again the next morning — still feeding in the same spot.', time: '2h ago', replies: [] },
-    { author: 'Marine Bio Student', text: 'Likely T-pod based on dorsal fin markings. Heading toward Chatham.', time: '1d ago', replies: [
-      { author: 'Captain Dave', text: 'That matches what I saw — six animals heading southeast.', time: '22h ago' }
+    { author: 'Captain D', text: 'Saw this group again the next morning — still feeding in the same spot.', time: '2h ago', replies: [] },
+    { author: 'Marine Bio Student', text: 'Heading toward Chatham.', time: '1d ago', replies: [
+      { author: 'Captain D', text: 'That matches what I saw — six animals heading southeast.', time: '22h ago' }
     ] }
   ],
   2: [
@@ -2517,12 +2531,12 @@ function resetContactForm() {
 const PHOTO_NOTE_COPY = {
   sighting: {
     credit: 'Credit features it in the gallery under your handle.',
-    anonymous: 'Shown in the gallery as "an anonymous Alaska Marine Animal Watch watcher."',
+    anonymous: 'Shown in the gallery as "an anonymous Alaska Marine Animal Watch contributor."',
     private: 'Keeps this photo private to your logbook — we never feature it.'
   },
   gallery: {
     credit: '"With credit" features it in the gallery under your handle.',
-    anonymous: 'Features it as "an anonymous Alaska Marine Animal Watch watcher."',
+    anonymous: 'Features it as "an anonymous Alaska Marine Animal Watch contributor."',
     private: 'Keeps it in your private logbook — we never feature it.'
   }
 };
@@ -2532,6 +2546,17 @@ function updatePhotoNote(btn, noteId) {
   const set = noteId === 'photoNoteGallery' ? PHOTO_NOTE_COPY.gallery : PHOTO_NOTE_COPY.sighting;
   const line = set[btn.dataset.value] || set.private;
   note.textContent = line + ' You can change your mind on any photo, any time.';
+}
+
+// ─── PATCH WALL VISIBILITY NOTE ───
+const PATCH_WALL_NOTE = {
+  public: 'Your patch wall is public — anyone can view it from the Top Sightings page through the Patch Wall link by your name.',
+  private: 'Only you can see your patch wall. Your pinned patch still shows on your avatar wherever you appear.'
+};
+function updatePatchWallNote(btn) {
+  const note = document.getElementById('patchWallNote');
+  if (!note) return;
+  note.textContent = PATCH_WALL_NOTE[btn.dataset.value] || PATCH_WALL_NOTE.public;
 }
 
 // ─── MAP ───
@@ -2945,9 +2970,9 @@ function patchGlyph(id, color) {
 }
 
 // Sample member patch walls for prototype demo.
-// public:false = private wall (pinned patch still shows on the Leaderboard).
+// public:false = private wall (pinned patch still shows on the Top Sightings page).
 const MEMBER_PATCHES = {
-  TidesWithTara: { public: true, patches: [
+  FlamesBiggestFan: { public: true, patches: [
     { glyph:'fluke', name:'Fluke ID Match', sub:'HW-2026-041 · May 12', color:'#7AE8D1', pinned:true },
     { glyph:'orca', name:'First-of-Season Orca', sub:'May 3', color:'#E8634A' },
     { glyph:'streak', name:'Named-Pod Streak', sub:'T-pod · 3 weeks', color:'#B5DBEC' },
@@ -3038,6 +3063,13 @@ const MY_SIGHTINGS = [
   { idx: 8, share: 'anonymous' },
   { idx: 9, share: 'private' }
 ];
+const MY_SIGHTINGS_MORE = [
+  { idx: 1, share: 'private' },
+  { idx: 3, share: 'anonymous' },
+  { idx: 5, share: 'credit' }
+];
+function mySightingsAll() { return MY_SIGHTINGS.concat(MY_SIGHTINGS_MORE); }
+let showAllSightings = false;
 const SHARE_LABELS = {
   credit: 'Public with credit',
   anonymous: 'Public · anonymous',
@@ -3062,7 +3094,8 @@ function fmtSightDate(s) {
 function renderMySightings() {
   const list = document.getElementById('mySightingsList');
   if (!list) return;
-  list.innerHTML = MY_SIGHTINGS.map((e, i) => {
+  const entries = showAllSightings ? mySightingsAll() : MY_SIGHTINGS;
+  list.innerHTML = entries.map((e, i) => {
     const s = mySightingData(e);
     const color = SPECIES_COLORS[s.species] || SPECIES_COLORS['Other'];
     const n = threadCount(e);
@@ -3078,8 +3111,14 @@ function renderMySightings() {
       </div>`;
   }).join('');
 }
+function toggleMoreSightings() {
+  showAllSightings = !showAllSightings;
+  const btn = document.getElementById('moreSightingsBtn');
+  if (btn) btn.textContent = showAllSightings ? 'Show fewer ↑' : 'More sightings ↓';
+  renderMySightings();
+}
 function openLogbook(i) {
-  const e = MY_SIGHTINGS[i];
+  const e = mySightingsAll()[i];
   if (!e) return;
   const s = mySightingData(e);
   const vd = VESSEL_DENSITY.getLevel(s.vessel_count);
@@ -3126,7 +3165,7 @@ function openLogbook(i) {
   document.getElementById('lbOverlay').classList.add('open');
 }
 function setShareState(btn, i) {
-  const e = MY_SIGHTINGS[i];
+  const e = mySightingsAll()[i];
   if (!e) return;
   e.share = btn.dataset.k;
   btn.parentElement.querySelectorAll('.toggle-option').forEach(b => b.classList.remove('active'));
@@ -3156,7 +3195,7 @@ renderMySightings();
     <div class="pw-sub">Patch wall</div>
     <div class="pw-grid" id="pwGrid"></div>
     <div class="pw-private" id="pwPrivate" style="display:none;">
-      This watcher keeps their patch wall private. Their pinned patch still shows on the Leaderboard — some people just watch quietly.
+      This contributor keeps their patch wall private. Their pinned patch still shows on the Top Sightings page — some people just watch quietly.
     </div>
   </div>
 </div>
@@ -3201,6 +3240,6 @@ renderMySightings();
     <div id="lbBody"></div>
   </div>
 </div>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" nonce="YcxQsRAUhTx1xXFMcdVSzQ==" data-cf-beacon='{"version":"2024.11.0","token":"36b4216ae2dc4d5488c249161e71fe1e","spa":2}' crossorigin="anonymous"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" nonce="wnAld3AXXhTk1yiH/5zGRQ==" data-cf-beacon='{"version":"2024.11.0","token":"36b4216ae2dc4d5488c249161e71fe1e","spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
