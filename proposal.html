@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMAW Proposal — Alaska Marine Animal Watch | CBJ, October 2026</title>
+<meta name="description" content="Proposal for implementation of the AMAW app: a community-science platform for Southeast Alaska's marine environment, prepared for the City and Borough of Juneau, October 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Elms+Sans:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Lato:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #FAF9F7;
+  --surface: #ffffff;
+  --ink: #0A1628;
+  --body-text: #3d5a80;
+  --muted: #6b89ab;
+  --teal: #1E77AF;
+  --teal-deep: #16618F;
+  --coral: #E8634A;
+  --border: rgba(15,32,56,0.12);
+  --border-strong: rgba(22,97,143,0.25);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font-display: 'Elms Sans', sans-serif;
+  --font-body: 'Lato', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--paper);
+  color: var(--body-text);
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+p, li, blockquote { text-wrap: pretty; }
+h1, h2, h3, h4 { text-wrap: balance; }
+
+.doc-wrap {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ─── header ─── */
+.doc-header {
+  background: linear-gradient(180deg, #ffffff 0%, var(--paper) 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 3.5rem 1.5rem 3rem;
+  text-align: center;
+}
+.doc-header-inner { max-width: 680px; margin: 0 auto; }
+.doc-brand {
+  font-family: var(--font-display);
+  font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 1.1rem;
+}
+.doc-header h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 4.5vw, 2.5rem);
+  font-weight: 800; line-height: 1.12;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-bottom: 0.75rem;
+}
+.doc-kind {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 0.8rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--teal-deep);
+  background: rgba(30,119,175,0.07);
+  border: 1px solid var(--border-strong);
+  border-radius: 100px;
+  padding: 0.4rem 1.1rem;
+  margin: 0.4rem 0 1.8rem;
+}
+.doc-meta {
+  display: grid; gap: 0.9rem;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.4rem 1.6rem;
+  box-shadow: 0 2px 12px rgba(10,22,40,0.05);
+}
+.doc-meta-row { font-size: 0.92rem; }
+.doc-meta-row strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.25rem;
+}
+.doc-meta-row span { color: var(--ink); }
+
+/* ─── body sections ─── */
+.doc-main { padding: 3rem 0 1rem; }
+.doc-section { margin-bottom: 3rem; }
+.doc-label {
+  font-family: var(--font-display);
+  font-size: 0.66rem; font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 0.35rem;
+}
+.doc-section h2 {
+  font-family: var(--font-display);
+  font-size: 1.45rem; font-weight: 800;
+  color: var(--ink);
+  line-height: 1.2;
+  margin-bottom: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border);
+}
+.doc-section h3 {
+  font-family: var(--font-display);
+  font-size: 1.05rem; font-weight: 700;
+  color: var(--teal-deep);
+  margin: 1.5rem 0 0.5rem;
+}
+.doc-section p { margin-bottom: 1rem; }
+.doc-section p:last-child { margin-bottom: 0; }
+.doc-section ol, .doc-section ul { margin: 0 0 1rem 1.4rem; }
+.doc-section li { margin-bottom: 0.6rem; }
+.doc-section li strong { color: var(--ink); }
+.num {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  color: var(--teal);
+}
+blockquote {
+  border-left: 3px solid var(--teal);
+  background: var(--surface);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 1.1rem 1.4rem;
+  margin: 1.4rem 0;
+  font-style: italic;
+  color: var(--ink);
+}
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 1.4rem 1.6rem;
+  margin: 1.5rem 0;
+}
+.callout .doc-label { margin-bottom: 0.2rem; }
+
+/* ─── contacts ─── */
+.contact-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1.4rem 0;
+}
+@media (max-width: 560px) { .contact-grid { grid-template-columns: 1fr; } }
+.contact-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.4rem;
+}
+.contact-card .name {
+  font-family: var(--font-display);
+  font-weight: 800; font-size: 1rem;
+  color: var(--ink);
+  margin-bottom: 0.3rem;
+}
+.contact-card .detail {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--teal-deep);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+/* ─── footer ─── */
+.doc-footer {
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  padding: 2.25rem 1.5rem 2.5rem;
+  text-align: center;
+}
+.doc-footer-inner { max-width: 680px; margin: 0 auto; }
+.doc-footer .stamp {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+.site-links {
+  display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap;
+  margin-bottom: 1.2rem;
+}
+.site-link {
+  font-family: var(--font-display);
+  font-size: 0.82rem; font-weight: 700;
+  color: var(--teal-deep);
+  text-decoration: none;
+  border: 1.5px solid var(--teal);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 1.2rem;
+  transition: background 0.2s;
+}
+.site-link:hover { background: rgba(30,119,175,0.08); }
+.doc-footer .fine {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/* ─── print ─── */
+@media print {
+  body { background: #ffffff; color: #222; font-size: 11pt; }
+  .site-links, .doc-kind { display: none; }
+  .doc-header { background: #fff; border-bottom: 2px solid #0A1628; padding-top: 1rem; }
+  .doc-section { margin-bottom: 1.6rem; }
+  .doc-section h2 { break-after: avoid; }
+  .doc-section h3 { break-after: avoid; }
+  .contact-card, .callout { break-inside: avoid; box-shadow: none; }
+  a { color: inherit; text-decoration: none; }
+  .doc-footer { border-top: 2px solid #0A1628; background: #fff; }
+}
+</style>
+</head>
+<body>
+
+<header class="doc-header">
+  <div class="doc-header-inner">
+    <div class="doc-brand">Alaska Marine Animal Watch</div>
+    <h1>An App for Community Scientists and Maritime&nbsp;Tourism Operators</h1>
+    <div class="doc-kind">Proposal for Implementation of the AMAW App</div>
+    <div class="doc-meta">
+      <div class="doc-meta-row">
+        <strong>Submitted to</strong>
+        <span>City and Borough of Juneau City Manager's Office; Mayor Beth Weldon; City Manager Katie Koester; Tourism Manager Alexandra Pierce; Tourism Best Management Practices Administrator Kymberly Kotlarov; and Visitor Industry Task Force 2.0 Members.</span>
+      </div>
+      <div class="doc-meta-row">
+        <strong>Prepared by</strong>
+        <span>Luke Holton and Jojo Goerner — Juneau Maritime and Visitor Industry Stakeholders</span>
+      </div>
+      <div class="doc-meta-row">
+        <strong>Date</strong>
+        <span>October 2026</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="doc-wrap doc-main">
+
+  <section class="doc-section">
+    <div class="doc-label">Executive Summary</div>
+    <h2>Executive Summary</h2>
+    <p>AMAW (formally referenced during development as WAKE) is a community-science platform for the marine environment, in the spirit of iNaturalist, but locally conceived and prototyped. It began as a tool to share findings and track personal sightings of Alaska's marine mammals. It grew into a single practical interface that combines whale-sighting, research reporting, marine weather, vessel-position awareness, and marine mammal avoidance alerts.</p>
+    <p>AMAW is a community-forward app: it was not built for a contract or a committee, but because Juneau's on-the-water community needed one place to collect, share, and preserve its own observations. The project team brings decades of combined experience in Juneau's marine tourism environment and has spent more than two years consulting with researchers, whale-watching operators and organizations in other ports, marine technology specialists, and local stakeholders.</p>
+    <p>This is not a speculative procurement concept presented by an outside software vendor. AMAW shared a working prototype with prospective collaborators in April and August 2026. AMAW is nearly ready for release. Private beta testing has begun and will continue throughout the winter. We plan to launch publicly April 2027, in time for the visitor season.</p>
+  </section>
+
+  <section class="doc-section">
+    <div class="doc-label">The Ask</div>
+    <h2>Request</h2>
+    <p>AMAW is a ready, locally built application scheduled for public launch. It aligns closely with the need the VITF has identified: a credible tool to track and monitor visitor-industry activity on Juneau's waters. Juneau is a world-class humpback whale watching destination. Maintaining that standing calls for leadership in understanding these waters. That means using the best available data on whales, vessel activity, marine conditions, and shaping policies that keep people, boats, and marine mammals safe.</p>
+    <p>Developing a comparable app with an outside vendor would take years and unknown funding. The Borough can skip that path entirely: the AMAW prototype is finished, and its working relationships with the Marine Exchange of Alaska, the University of Alaska Southeast, Happy Whale, and the Juneau Flukes photo-identification catalog are already in place.</p>
+    <p>The project team invites CBJ to partner through a one-year, no-cost pilot under the written agreement. If the Borough would like a role in that partnership, the team will gladly build an institutional layer, such as a CBJ dashboard and TBMP tie-ins, at no additional cost. If not, AMAW will launch and continue developing as the community-forward app it's always been.</p>
+    <blockquote>AMAW is offered as an independent platform through a formal licensing partnership — a gift of use, not a transfer of ownership. The Borough's license provides staff access to the necessary aggregate data via a dedicated dashboard and a TBMP reporting channel built into the app.</blockquote>
+    <p>A license gives the Borough access to that data while the project team retains ownership and management of the platform. This arrangement is already commonplace in Juneau. Public agencies such as USCG, the State of Alaska, NOAA, the National Weather Service, and even CBJ rely on vessel-position data from the Marine Exchange of Alaska, an independent organization, rather than operating their own tracking infrastructure. AMAW follows the same model, independently built and maintained, with data access provided through a formal agreement.</p>
+    <p>CBJ receives this license at no cost for the one-year pilot. Following the pilot, the project team will present an annual license fee and itemized operating costs based on the pilot's actual figures. AMAW will scope and price any development requests by CBJ under a separate contract.</p>
+    <p>AMAW can be licensed to other boroughs and to any cruise or whale-watch port seeking independent marine mammal monitoring.</p>
+  </section>
+
+  <section class="doc-section">
+    <div class="doc-label">Section <span class="num">1</span></div>
+    <h2>Background and Development History</h2>
+    <p>AMAW grew from firsthand experience with vessel congestion, community backlash, whale-watching pressures, and the difficulty of integrating safety and stewardship practices across commercial, recreational, ferry, and cruise-vessel operations in Southeast Alaska. Working with management agencies across the tourism sector, the team identified the missing tools and built them into a single platform.</p>
+    <p>2024–2026 correspondence includes consultation with the University of Alaska Southeast, Pacific Whale Watch Association (PWWA), Happy Whale, the Juneau Flukes photo-identification catalog, Marine Exchange of Alaska, NOAA Fisheries, US National Park Service, US Coast Guard, Alaska Office of Boating Safety, Marine Mammal Commission, TBMP-compliant businesses, and countless undocumented consultations with others.</p>
+    <div class="callout">
+      <div class="doc-label">Status &amp; Timeline</div>
+      <p>AMAW is nearly ready for release. Private beta testing continues through the winter, with public launch in April 2027. This proposal is CBJ's invitation to help shape the institutional layer — dashboard, TBMP channel, and what data needs to be accessed — before launch.</p>
+    </div>
+  </section>
+
+  <section class="doc-section">
+    <div class="doc-label">Section <span class="num">2</span></div>
+    <h2>Issues Noted within Juneau's Maritime Community</h2>
+    <ol>
+      <li><strong>Fragmented operational information:</strong> Marine weather, AIS (vessel tracking), whale observations and sharing, USCG Advisories, and operator networking are distributed across separate tools, requiring operators to switch app platforms while underway.</li>
+      <li><strong>Visitor-industry accountability:</strong> Juneau needs credible, consistent, and fair mechanisms to understand marine tourism activity, support operator education, and document patterns without presuming misconduct.</li>
+      <li><strong>Research value:</strong> Juneau's remarkable naturalist community is an untapped resource for marine mammal data collection. On-board naturalists can bolster community science programs across the State of Alaska with data to examine distribution, temporal patterns, vessel interactions, and changing habitat use.</li>
+      <li><strong>Recreational boating safety:</strong> A unified interface could improve access to relevant weather and vessel traffic information, plus locally tailored safety guidance, to help recreational boaters operate safely around the commercial whale-watch fleet.</li>
+    </ol>
+  </section>
+
+  <section class="doc-section">
+    <div class="doc-label">Section <span class="num">3</span></div>
+    <h2>AMAW: One Interface, Multiple Integrated Functions</h2>
+    <h3>MXAK Blue View Weather</h3>
+    <p>MXAK provides the most accurate and regionally focused weather statistics for Juneau's intricate marine environment. Locally operated, MXAK specializes in Southeast Alaska climatology and marine-environment conditions.</p>
+    <h3>Happy Whale</h3>
+    <p>A widely used app in Juneau's naturalist community that connects community scientists worldwide. With an emphasis on Humpback Whale tracking, the app is regarded by cetacean biologists as a platform with high-fidelity submissions and research-quality datasets.</p>
+    <h3>Whale Alert</h3>
+    <p>The whale-strike avoidance network co-developed by NPS Glacier Bay with cruise ship captains and marine pilots, in partnership with NOAA Fisheries. Sightings entered by local operators feed the same real-time updates that cruise and ferry bridges use to anticipate whale concentrations and comply with the speed and approach restrictions in Glacier Bay whale waters under 36 CFR Part 13, Subpart N.</p>
+    <h3>AIS (Automatic Identification System)</h3>
+    <p>With AIS already implemented by SEAWWA as an equipment mandate for whale watch vessels, it is arguably the most-used app across the fleet. It lets operators see the current position of all vessels, helping the captain avoid areas that might be overly saturated with other vessels.</p>
+    <h3>Know Before You Go</h3>
+    <p>This integration is education-centric. Using existing training platforms such as NOAA's Whale SENSE, the Alaska Office of Boating Safety's Know Before You Go, and the Alaska Department of Fish and Game's Sportfishing Regulation Handbook, mariners can access information on safe and legal boating practices in Alaska's waterways.</p>
+    <h3>TBMP (Tourism Best Management Practices)</h3>
+    <p>With TBMP's permission, we hope to include a function that reflects the latest TBMP guidelines and allows users to submit confidential reports.</p>
+  </section>
+
+  <section class="doc-section">
+    <div class="doc-label">Section <span class="num">4</span></div>
+    <h2>Research, Conservation and Safety Benefits</h2>
+    <p>A carefully governed sightings database turns routine operator observations into research-grade records: consistent time and position data, species confidence, observation effort, photographic references, vessel proximity, environmental conditions and audit history. Regional experts should determine data standards, quality-control methods, retention rules, and whether sensitive wildlife-location information must be delayed, generalized, or restricted.</p>
+    <p>For strike avoidance, a Whale Alert-style module could disseminate recent observations and caution areas to participating vessel operators, including ferry and cruise-ship bridge teams where practical. Its operational value depends on reliable reports, latency controls, integration pathways, and explicit bridge procedures. It should supplement — not replace — lookouts, radar, AIS, navigation rules, company procedures or regulatory requirements.</p>
+  </section>
+
+  <section class="doc-section">
+    <div class="doc-label">Section <span class="num">5</span></div>
+    <h2>Municipal Value, Operating Model, and Cost Avoidance</h2>
+    <p>The most immediate savings for CBJ is the work that is already done: no early concept design or prototype development would need to be commissioned, because AMAW exists today. The project team has already invested time and expertise in user needs, stakeholder consultation, software prototyping, and demonstrations. We propose to provide CBJ full use of that existing work at no charge during the pilot.</p>
+    <p>Stewardship of the destination is part of the municipal value. Juneau's flagship visitor experience depends on a healthy marine mammal population, a safe and orderly fleet, and public confidence that both are being looked after. Policy built on that data is what allows a world-class destination to remain one.</p>
+    <p>To be clear, the no-cost offer covers the one-year pilot. Anything beyond it — a continued license, new features, or a system CBJ builds itself one day — carries costs CBJ should assess on its own. No dollar-savings estimate is offered, because an honest one requires a defined scope and a comparable procurement baseline.</p>
+    <p>By design, roughly <strong>70% of AMAW's operations are automated</strong> while the remaining 30% needs a human. For the first year, the team will field a small group of volunteers and carry the pilot's operating costs. The volunteer model costs are modest, roughly $1,000–$2,500 a year for hosting and coordination. A staffed model could cost up to $20,000 per year. These costs will be itemized in the Phase 4 evaluation, so the Assembly doesn't have to take the post-pilot pricing on faith.</p>
+    <p>Local ownership of the problem is an additional advantage. Our team understands Juneau's marine tourism operating environment, stakeholder relationships, and field constraints, and can test the interface with actual operators rather than relying solely on generic technology assumptions.</p>
+  </section>
+
+  <section class="doc-section">
+    <div class="doc-label">Section <span class="num">6</span></div>
+    <h2>Recommended Implementation Approach</h2>
+    <h3>Phase 1 — CBJ Discovery and Governance <span class="num">(0–60 days)</span></h3>
+    <p>Convene CBJ tourism, TBMP, Docks and Harbors, appropriate safety agencies, research advisers, commercial and recreational operators. Review prototypes, define objectives, data roles, and pilot success criteria.</p>
+    <h3>Phase 2 — Technical and Legal Validation <span class="num">(60–120 days)</span></h3>
+    <p>Confirm data-source permissions, API feasibility, alert validation, AIS licensing, privacy/confidentiality rules, cybersecurity, and ownership. Obtain written partner commitments as applicable.</p>
+    <h3>Phase 3 — Controlled Juneau Pilot <span class="num">(one year, no cost to CBJ)</span></h3>
+    <p>Test with a limited voluntary cohort of whale-watch operators and research partners; assess usability, data quality, alert delivery, and reporting workflows before inviting ferry/cruise participation.</p>
+    <h3>Phase 4 — Evaluation and Scaled Deployment</h3>
+    <p>Report pilot metrics and itemized costs to CBJ; present a costed operating model based on the pilot's actual numbers; decide whether to expand, revise, procure support, or discontinue based on measurable performance.</p>
+  </section>
+
+  <section class="doc-section">
+    <div class="doc-label">Section <span class="num">7</span></div>
+    <h2>Governance and Safeguards</h2>
+    <ul>
+      <li>Establish clear ownership, stewardship, retention, and permitted uses for operator reports, whale observations, photographs, and vessel-position information. Custody of raw, anonymized incident reports remains with the independent project team; CBJ receives aggregates and dashboards.</li>
+      <li>For any TBMP reporting function, implement confidentiality controls, access restrictions, documented review and appeal procedures, safeguards against false or retaliatory reports, and an explicit division between complaints and verified findings.</li>
+      <li>Use role-based access, appropriate aggregation or delay of sensitive locations, audit trails, and an incident-response plan.</li>
+      <li>Label data freshness and uncertainty; avoid representing sighting alerts as real-time guarantees or as a substitute for navigational judgment.</li>
+      <li>Use a written pilot agreement specifying scope, intellectual property, liability, funding responsibilities, exit rights, and public-records obligations.</li>
+    </ul>
+  </section>
+
+  <section class="doc-section">
+    <div class="doc-label">Section <span class="num">8</span></div>
+    <h2>Proposed Measures of Success</h2>
+    <p>Pilot evaluation should include active operators and reporting frequency; observation completeness and researcher acceptance; alert latency and false-positive rates; usability in underway conditions; documented safety outcomes (near-miss and incident reports, training uptake); user satisfaction; CBJ staff use of the dashboard and TBMP channel; and verified implementation and operating costs. Establish a baseline before the pilot launch.</p>
+  </section>
+
+  <section class="doc-section">
+    <div class="doc-label">Section <span class="num">9</span></div>
+    <h2>Requested Action by CBJ</h2>
+    <p>We would welcome a meeting with CBJ managers and VITF members. We built this as an independent community app because an accountability tool only works if the industry it watches doesn't own it. We're offering CBJ full use of AMAW, the data your departments need, and the time we've already invested, at no cost for one year, under a written pilot agreement. Please reach out to us at:</p>
+    <div class="contact-grid">
+      <div class="contact-card">
+        <div class="name">Luke Holton</div>
+        <div class="detail">lukeholton@seagservices.com</div>
+      </div>
+      <div class="contact-card">
+        <div class="name">Jojo Goerner</div>
+        <div class="detail">(503) 877-9511<br>hello@alaskamarineanimalwatch.com</div>
+      </div>
+    </div>
+    <p>We hope this proposal supports the future of tourism in Juneau by building a network for tourism professionals, promoting accountability in commerce, and strengthening the Borough's operational capacity. Your efforts within the VITF and the Manager's Office have been truly thankless, and we want to thank you for your hard work this past year.</p>
+  </section>
+
+</main>
+
+<footer class="doc-footer">
+  <div class="doc-footer-inner">
+    <div class="stamp">AMAW &nbsp;|&nbsp; CBJ Proposal &nbsp;|&nbsp; October 2026</div>
+    <div class="site-links">
+      <a class="site-link" href="/">Back to the pitch page</a>
+      <a class="site-link" href="mockup.html">Explore the prototype</a>
+    </div>
+    <p class="fine">Alaska Marine Animal Watch is an independently operated, for-profit project. Prepared for the City and Borough of Juneau.</p>
+  </div>
+</footer>
+
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" nonce="BQJi3xzswEn9Wmq9l7DaaQ==" data-cf-beacon='{"version":"2024.11.0","token":"36b4216ae2dc4d5488c249161e71fe1e","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
