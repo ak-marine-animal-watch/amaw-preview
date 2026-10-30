@@ -98,6 +98,24 @@ h1, h2, h3, h4 { text-wrap: balance; }
 }
 .doc-meta-row span { color: var(--ink); }
 
+/* ─── see-the-app banner ─── */
+.see-app {
+  display: flex; align-items: center; justify-content: center;
+  gap: 1.25rem; flex-wrap: wrap;
+  background: rgba(30,119,175,0.06);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.4rem;
+  margin: -1.6rem auto 3rem;
+  text-align: center;
+}
+.see-app p {
+  font-family: var(--font-display);
+  font-weight: 600; font-size: 0.95rem;
+  color: var(--ink);
+  margin: 0;
+}
+
 /* ─── body sections ─── */
 .doc-main { padding: 3rem 0 1rem; }
 .doc-section { margin-bottom: 3rem; }
@@ -217,6 +235,7 @@ blockquote {
 @media print {
   body { background: #ffffff; color: #222; font-size: 11pt; }
   .site-links, .doc-kind { display: none; }
+  .see-app .site-link { display: none; }
   .doc-header { background: #fff; border-bottom: 2px solid #0A1628; padding-top: 1rem; }
   .doc-section { margin-bottom: 1.6rem; }
   .doc-section h2 { break-after: avoid; }
@@ -252,6 +271,11 @@ blockquote {
 </header>
 
 <main class="doc-wrap doc-main">
+
+  <div class="see-app">
+    <p>Everything in this proposal is backed by a working prototype.</p>
+    <a class="site-link" href="mockup.html">See the app →</a>
+  </div>
 
   <section class="doc-section">
     <div class="doc-label">Executive Summary</div>
@@ -383,13 +407,13 @@ blockquote {
   <div class="doc-footer-inner">
     <div class="stamp">AMAW &nbsp;|&nbsp; CBJ Proposal &nbsp;|&nbsp; October 2026</div>
     <div class="site-links">
+      <a class="site-link" href="mockup.html">See the app</a>
       <a class="site-link" href="/">Back to the pitch page</a>
-      <a class="site-link" href="mockup.html">Explore the prototype</a>
     </div>
     <p class="fine">Alaska Marine Animal Watch is an independently operated, for-profit project. Prepared for the City and Borough of Juneau.</p>
   </div>
 </footer>
 
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" nonce="BQJi3xzswEn9Wmq9l7DaaQ==" data-cf-beacon='{"version":"2024.11.0","token":"36b4216ae2dc4d5488c249161e71fe1e","spa":2}' crossorigin="anonymous"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" nonce="12xz6NkAHV+6yoqHkHWqgg==" data-cf-beacon='{"version":"2024.11.0","token":"36b4216ae2dc4d5488c249161e71fe1e","spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
